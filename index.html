@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEDI-TRACK - Real-Time Device Tracking</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        :root {
+            --primary: #a7dca5;
+            --primary-dark: #90cf8e;
+            --secondary: #a6c8e0;
+            --danger: #d33434;
+            --warning: #f2c94c;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --ocean: #e3f2fd;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f0f7ff, #e4f1fe);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo h1 {
+            font-weight: 700;
+            font-size: 1.8rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .logo-icon {
+            background-color: #fff;
+            color: var(--primary);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 5px;
+            margin-top: 15px;
+        }
+        
+        .nav-tab {
+            background-color: rgba(255,255,255,0.15);
+            padding: 10px 24px;
+            border-radius: 20px 20px 0 0;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .nav-tab:hover {
+            background-color: rgba(255,255,255,0.25);
+        }
+        
+        .nav-tab.active {
+            background-color: white;
+            color: var(--primary);
+            font-weight: 600;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .last-update {
+            background-color: rgba(255,255,255,0.15);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .device-count {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(255,255,255,0.15);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+        
+        .tab-content {
+            display: none;
+            background: white;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .tab-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 16px 20px;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .tab-body {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .map-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+            height: 500px;
+            position: relative;
+        }
+        
+        .map-container .header {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--light-gray);
+            font-weight: 600;
+            background-color: var(--light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        #outdoor-map, #indoor-map {
+            width: 100%;
+            height: calc(100% - 45px);
+        }
+        
+        .data-table-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .data-table-container .header {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--light-gray);
+            font-weight: 600;
+            background-color: var(--light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .data-table th {
+            background-color: var(--primary);
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+        }
+        
+        .data-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .data-table tr:nth-child(even) {
+            background-color: var(--light);
+        }
+        
+        .data-table tr:hover {
+            background-color: #e8f4ff;
+        }
+        
+        .accuracy-circle {
+            stroke: #a4c6eb;
+            stroke-width: 2;
+            fill: rgba(255, 0, 0, 0.1);
+            pointer-events: none;
+        }
+        
+        .device-marker {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            border: 2px solid white;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .device-marker.alert {
+            background-color: var(--danger);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(234, 67, 53, 0.7); }
+            70% { box-shadow: 0 0 0 12px rgba(234, 67, 53, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(234, 67, 53, 0); }
+        }
+        
+        .anchor-point {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.7rem;
+        }
+        
+        .map-legend {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.92);
+            padding: 12px 16px;
+            border-radius: 10px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            font-size: 0.9rem;
+            border: 1px solid var(--light-gray);
+        }
+        
+        .legend-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary);
+            font-size: 1rem;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .legend-color {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            margin-right: 10px;
+            border: 2px solid white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        .indoor-grid {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-color: #e3f2fd;
+            border: 2px solid var(--primary);
+        }
+        
+        .grid-line {
+            position: absolute;
+            background-color: rgba(44, 111, 187, 0.2);
+        }
+        
+        .grid-line.vertical {
+            width: 1px;
+            height: 100%;
+            top: 0;
+        }
+        
+        .grid-line.horizontal {
+            height: 1px;
+            width: 100%;
+            left: 0;
+        }
+        
+        .room-label {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: 1px solid var(--primary);
+        }
+        
+        .distance-line {
+            position: absolute;
+            height: 2px;
+            background-color: var(--danger);
+            transform-origin: 0 0;
+        }
+        
+        .distance-label {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            transform: translate(-50%, -100%);
+            color: var(--danger);
+            font-weight: 500;
+        }
+        
+        .status-indicator {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background-color: var(--success);
+            display: inline-block;
+            margin-right: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        .status-indicator.alert {
+            background-color: var(--danger);
+        }
+        
+        .blink {
+            animation: blink 1.5s infinite;
+        }
+        
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        footer {
+            background: white;
+            padding: 20px;
+            text-align: center;
+            color: var(--gray);
+            font-size: 0.95rem;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+        }
+        
+        /* Status badges */
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-normal {
+            background-color: rgba(46, 125, 50, 0.15);
+            color: var(--success);
+        }
+        
+        .status-alert {
+            background-color: rgba(211, 52, 52, 0.15);
+            color: var(--danger);
+            animation: blink 1.5s infinite;
+        }
+        
+        .refresh-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .refresh-btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 1200px) {
+            .tab-body {
+                grid-template-columns: 1fr;
+            }
+            
+            .map-container, .data-table-container {
+                height: 400px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .status-bar {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .nav-tabs {
+                margin-top: 15px;
+                overflow-x: auto;
+                width: 100%;
+                padding-bottom: 5px;
+            }
+            
+            .map-container, .data-table-container {
+                height: 350px;
+            }
+            
+            .tab-body {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">⚕️</div>
+                    <h1>MEDI-TRACK</h1>
+                </div>
+                <div class="status-bar">
+                    <div class="last-update">
+                        <i class="fas fa-sync-alt"></i>
+                        Last update: <span id="last-update">--:--:--</span>
+                    </div>
+                    <div class="device-count">
+                        <i class="fas fa-microchip"></i>
+                        Active devices: <strong id="active-devices">0</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-tabs">
+                <div class="nav-tab active" data-tab="outdoor">Outdoor Tracking</div>
+                <div class="nav-tab" data-tab="indoor">Indoor Tracking</div>
+            </div>
+        </header>
+        
+        <!-- Outdoor Tracking Tab -->
+        <div class="tab-content active" id="outdoor-tab">
+            <div class="tab-header">
+                <i class="fas fa-globe-americas"></i> Outdoor Device Tracking
+            </div>
+            <div class="tab-body">
+                <div class="map-container">
+                    <div class="header">
+                        <span>World Map with Device Locations</span>
+                        <button class="refresh-btn" id="refresh-outdoor">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                    <div id="outdoor-map"></div>
+                    <div class="map-legend">
+                        <div class="legend-title">Map Legend</div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: var(--primary);"></div>
+                            <span>Device Location</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: var(--danger);"></div>
+                            <span>Accuracy Circle (5m)</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-table-container">
+                    <div class="header">
+                        <span>Outdoor Device Data from ESP32 & GPS Module</span>
+                        <button class="refresh-btn" id="refresh-outdoor-table">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Device ID</th>
+                                <th>Timestamp</th>
+                                <th>Latitude</th>
+                                <th>Longitude</th>
+                                <th>Accuracy</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="outdoor-table-body">
+                            <!-- Data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Indoor Tracking Tab -->
+        <div class="tab-content" id="indoor-tab">
+            <div class="tab-header">
+                <i class="fas fa-hospital"></i> Indoor Device Tracking
+            </div>
+            <div class="tab-body">
+                <div class="map-container">
+                    <div class="header">
+                        <span>Hospital Layout with Anchors & Tags</span>
+                        <button class="refresh-btn" id="refresh-indoor">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                    <div id="indoor-map">
+                        <div class="indoor-grid">
+                            <!-- Grid lines will be added dynamically -->
+                            <!-- Anchors and tags will be positioned here -->
+                        </div>
+                    </div>
+                    <div class="map-legend">
+                        <div class="legend-title">Indoor Legend</div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: var(--secondary);"></div>
+                            <span>Anchor Position</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: var(--primary);"></div>
+                            <span>Device Tag</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: var(--danger);"></div>
+                            <span>Distance Line</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-table-container">
+                    <div class="header">
+                        <span>Indoor Device Data from ESP32 Anchors</span>
+                        <button class="refresh-btn" id="refresh-indoor-table">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Tag ID</th>
+                                <th>Timestamp</th>
+                                <th>Anchor ID</th>
+                                <th>Room</th>
+                                <th>Distance</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="indoor-table-body">
+                            <!-- Data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>MEDI-TRACK Smart Tracking System | Real-time Indoor/Outdoor Monitoring | Firebase Integration</p>
+            <p>Connected to Firebase Project: medi-track-demo</p>
+        </footer>
+    </div>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD2HBvSOnsQdbvtEmyssI6zDksSYS75v64",
+            authDomain: "medi-track-41c03.firebaseapp.com",
+            databaseURL: "https://medi-track-41c03-default-rtdb.firebaseio.com",
+            projectId: "medi-track-41c03",
+            storageBucket: "medi-track-41c03.appspot.com",
+            messagingSenderId: "198071000475",
+            appId: "1:198071000475:web:535f7bf78f8ecad659153e",
+            measurementId: "G-VWDGG74224"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        // Initialize outdoor map
+        const outdoorMap = L.map('outdoor-map').setView([3.1390, 101.6869], 18);
+        
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(outdoorMap);
+        
+        // DOM Elements
+        const lastUpdateEl = document.getElementById('last-update');
+        const activeDevicesEl = document.getElementById('active-devices');
+        
+        // Data storage
+        let outdoorMarkers = {};
+        let indoorTags = {};
+        
+        // Anchor configuration for indoor map
+        const anchorsConfig = [
+            {id: "ANC-A1", top: "20%", left: "20%"},
+            {id: "ANC-B2", top: "20%", left: "70%"},
+            {id: "ANC-C3", top: "70%", left: "20%"},
+            {id: "ANC-D4", top: "70%", left: "70%"}
+        ];
+        
+        // Initialize indoor map
+        function initializeIndoorMap() {
+            const indoorMap = document.querySelector('.indoor-grid');
+            
+            // Clear existing grid elements
+            indoorMap.innerHTML = '';
+            
+            // Create grid lines
+            for (let i = 1; i < 10; i++) {
+                // Vertical lines
+                const vLine = document.createElement('div');
+                vLine.className = 'grid-line vertical';
+                vLine.style.left = `${i * 10}%`;
+                indoorMap.appendChild(vLine);
+                
+                // Horizontal lines
+                const hLine = document.createElement('div');
+                hLine.className = 'grid-line horizontal';
+                hLine.style.top = `${i * 10}%`;
+                indoorMap.appendChild(hLine);
+            }
+            
+            // Add room labels
+            const rooms = [
+                {name: "ER Room 1", top: "15%", left: "15%"},
+                {name: "ICU Section", top: "15%", left: "65%"},
+                {name: "Pediatrics", top: "65%", left: "15%"},
+                {name: "Surgery", top: "65%", left: "65%"}
+            ];
+            
+            rooms.forEach(room => {
+                const label = document.createElement('div');
+                label.className = 'room-label';
+                label.textContent = room.name;
+                label.style.top = room.top;
+                label.style.left = room.left;
+                indoorMap.appendChild(label);
+            });
+            
+            // Add anchors
+            anchorsConfig.forEach(anchor => {
+                const anchorPoint = document.createElement('div');
+                anchorPoint.className = 'anchor-point';
+                anchorPoint.textContent = anchor.id;
+                anchorPoint.style.top = anchor.top;
+                anchorPoint.style.left = anchor.left;
+                indoorMap.appendChild(anchorPoint);
+            });
+        }
+        
+        // Initialize the indoor map
+        initializeIndoorMap();
+        
+        // Update outdoor map markers
+        function updateOutdoorMarker(key, device) {
+            if (!outdoorMarkers[key]) {
+                // Create new marker
+                outdoorMarkers[key] = {
+                    marker: L.marker([device.lat, device.lng], {
+                        title: device.id
+                    }).addTo(outdoorMap),
+                    circle: L.circle([device.lat, device.lng], {
+                        color: device.status === "alert" ? 'red' : 'blue',
+                        fillColor: device.status === "alert" ? '#f03' : '#03f',
+                        fillOpacity: 0.2,
+                        radius: device.accuracy || 5
+                    }).addTo(outdoorMap)
+                };
+                
+                // Add popup
+                outdoorMarkers[key].marker.bindPopup(`
+                    <b>${device.id}</b><br>
+                    Location: ${device.lat.toFixed(4)}° N, ${device.lng.toFixed(4)}° E<br>
+                    Status: ${device.status === "alert" ? '<span style="color:red">Alert</span>' : 'Active'}
+                `);
+            } else {
+                // Update existing marker
+                outdoorMarkers[key].marker.setLatLng([device.lat, device.lng]);
+                outdoorMarkers[key].circle.setLatLng([device.lat, device.lng]);
+                outdoorMarkers[key].circle.setStyle({
+                    color: device.status === "alert" ? 'red' : 'blue',
+                    fillColor: device.status === "alert" ? '#f03' : '#03f'
+                });
+            }
+        }
+        
+        // Update indoor tags and lines
+        function updateIndoorTag(key, device) {
+            const indoorMap = document.querySelector('.indoor-grid');
+            const gridWidth = indoorMap.offsetWidth;
+            const gridHeight = indoorMap.offsetHeight;
+            
+            // Create device marker
+            const marker = document.createElement('div');
+            marker.className = `device-marker ${device.status === "alert" ? "alert blink" : ""}`;
+            marker.textContent = device.id;
+            marker.style.top = `${device.y}%`;
+            marker.style.left = `${device.x}%`;
+            indoorMap.appendChild(marker);
+            
+            // Find connected anchor
+            const anchor = anchorsConfig.find(a => a.id === device.anchorId);
+            if (!anchor) return;
+            
+            // Create distance line
+            const startX = parseInt(anchor.left) / 100 * gridWidth;
+            const startY = parseInt(anchor.top) / 100 * gridHeight;
+            const endX = parseInt(device.x) / 100 * gridWidth;
+            const endY = parseInt(device.y) / 100 * gridHeight;
+            
+            const length = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+            const angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
+            
+            const line = document.createElement('div');
+            line.className = 'distance-line';
+            line.style.width = `${length}px`;
+            line.style.left = anchor.left;
+            line.style.top = anchor.top;
+            line.style.transform = `rotate(${angle}deg)`;
+            indoorMap.appendChild(line);
+            
+            // Create distance label
+            const label = document.createElement('div');
+            label.className = 'distance-label';
+            label.textContent = `${device.distance}m`;
+            label.style.left = `${(parseInt(anchor.left) + parseInt(device.x)) / 2}%`;
+            label.style.top = `${(parseInt(anchor.top) + parseInt(device.y)) / 2}%`;
+            indoorMap.appendChild(label);
+        }
+        
+        // Add outdoor data to table
+        function addToOutdoorTable(key, device) {
+            const tbody = document.getElementById('outdoor-table-body');
+            let row = document.getElementById(`outdoor-${key}`);
+            
+            if (!row) {
+                row = document.createElement('tr');
+                row.id = `outdoor-${key}`;
+                tbody.appendChild(row);
+            }
+            
+            const timestamp = new Date(device.timestamp).toLocaleString();
+            
+            row.innerHTML = `
+                <td><span class="status-indicator ${device.status === "alert" ? "alert" : ""}"></span> ${device.id}</td>
+                <td>${timestamp}</td>
+                <td>${device.lat.toFixed(6)}° N</td>
+                <td>${device.lng.toFixed(6)}° E</td>
+                <td>${device.accuracy || 5}m</td>
+                <td><span class="status-badge ${device.status === "alert" ? "status-alert" : "status-normal"}">${device.status === "alert" ? "⚠️ Alert" : "✅ Normal"}</span></td>
+            `;
+        }
+        
+        // Add indoor data to table
+        function addToIndoorTable(key, device) {
+            const tbody = document.getElementById('indoor-table-body');
+            let row = document.getElementById(`indoor-${key}`);
+            
+            if (!row) {
+                row = document.createElement('tr');
+                row.id = `indoor-${key}`;
+                tbody.appendChild(row);
+            }
+            
+            const timestamp = new Date(device.timestamp).toLocaleString();
+            const room = getRoomForPosition(device.x, device.y);
+            
+            row.innerHTML = `
+                <td><span class="status-indicator ${device.status === "alert" ? "alert" : ""}"></span> ${device.id}</td>
+                <td>${timestamp}</td>
+                <td>${device.anchorId}</td>
+                <td>${room}</td>
+                <td>${device.distance}m</td>
+                <td><span class="status-badge ${device.status === "alert" ? "status-alert" : "status-normal"}">${device.status === "alert" ? "⚠️ Alert" : "✅ Normal"}</span></td>
+            `;
+        }
+        
+        // Helper: Determine room based on position
+        function getRoomForPosition(x, y) {
+            // Example implementation - customize with your actual room coordinates
+            if (x < 40 && y < 40) return "ER Room 1";
+            if (x > 60 && y < 40) return "ICU Section";
+            if (x < 40 && y > 60) return "Pediatrics";
+            if (x > 60 && y > 60) return "Surgery";
+            return "Hallway";
+        }
+        
+        // Simulate Firebase data for demonstration
+        function simulateFirebaseData() {
+            // Outdoor devices
+            const outdoorDevices = {
+                "ESP32-AMB-01": {
+                    id: "ESP32-AMB-01",
+                    lat: 3.1390 + (Math.random() - 0.5) * 0.0002,
+                    lng: 101.6869 + (Math.random() - 0.5) * 0.0002,
+                    accuracy: 5,
+                    status: "active",
+                    timestamp: Date.now()
+                },
+                "ESP32-VAN-02": {
+                    id: "ESP32-VAN-02",
+                    lat: 3.1402 + (Math.random() - 0.5) * 0.0002,
+                    lng: 101.6883 + (Math.random() - 0.5) * 0.0002,
+                    accuracy: 5,
+                    status: "active",
+                    timestamp: Date.now()
+                },
+                "ESP32-MON-03": {
+                    id: "ESP32-MON-03",
+                    lat: 3.1385 + (Math.random() - 0.5) * 0.0002,
+                    lng: 101.6852 + (Math.random() - 0.5) * 0.0002,
+                    accuracy: 5,
+                    status: "alert",
+                    timestamp: Date.now()
+                },
+                "ESP32-ICU-04": {
+                    id: "ESP32-ICU-04",
+                    lat: 3.1411 + (Math.random() - 0.5) * 0.0002,
+                    lng: 101.6876 + (Math.random() - 0.5) * 0.0002,
+                    accuracy: 5,
+                    status: "active",
+                    timestamp: Date.now()
+                }
+            };
+            
+            // Indoor devices
+            const indoorDevices = {
+                "TAG-101": {
+                    id: "TAG-101",
+                    anchorId: "ANC-A1",
+                    x: 25 + (Math.random() - 0.5) * 5,
+                    y: 30 + (Math.random() - 0.5) * 5,
+                    distance: (3.2 + (Math.random() - 0.5) * 0.5).toFixed(1),
+                    status: "normal",
+                    timestamp: Date.now()
+                },
+                "TAG-102": {
+                    id: "TAG-102",
+                    anchorId: "ANC-B2",
+                    x: 75 + (Math.random() - 0.5) * 5,
+                    y: 30 + (Math.random() - 0.5) * 5,
+                    distance: (1.8 + (Math.random() - 0.5) * 0.5).toFixed(1),
+                    status: "normal",
+                    timestamp: Date.now()
+                },
+                "TAG-103": {
+                    id: "TAG-103",
+                    anchorId: "ANC-C3",
+                    x: 30 + (Math.random() - 0.5) * 5,
+                    y: 60 + (Math.random() - 0.5) * 5,
+                    distance: (4.7 + (Math.random() - 0.5) * 0.5).toFixed(1),
+                    status: "alert",
+                    timestamp: Date.now()
+                },
+                "TAG-104": {
+                    id: "TAG-104",
+                    anchorId: "ANC-D4",
+                    x: 75 + (Math.random() - 0.5) * 5,
+                    y: 60 + (Math.random() - 0.5) * 5,
+                    distance: (2.1 + (Math.random() - 0.5) * 0.5).toFixed(1),
+                    status: "normal",
+                    timestamp: Date.now()
+                }
+            };
+            
+            // Update UI with simulated data
+            updateUIWithDevices(outdoorDevices, indoorDevices);
+        }
+        
+        // Update UI with device data
+        function updateUIWithDevices(outdoorDevices, indoorDevices) {
+            // Clear existing data
+            document.getElementById('outdoor-table-body').innerHTML = '';
+            document.getElementById('indoor-table-body').innerHTML = '';
+            initializeIndoorMap();
+            
+            // Update outdoor devices
+            let activeCount = 0;
+            Object.entries(outdoorDevices).forEach(([key, device]) => {
+                updateOutdoorMarker(key, device);
+                addToOutdoorTable(key, device);
+                if (device.status !== "inactive") activeCount++;
+            });
+            
+            // Update indoor devices
+            Object.entries(indoorDevices).forEach(([key, device]) => {
+                updateIndoorTag(key, device);
+                addToIndoorTable(key, device);
+                if (device.status !== "inactive") activeCount++;
+            });
+            
+            // Update device count and timestamp
+            activeDevicesEl.textContent = activeCount;
+            lastUpdateEl.textContent = new Date().toLocaleTimeString();
+        }
+        
+        // Tab switching functionality
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs
+                document.querySelectorAll('.nav-tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Hide all tab content
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Show selected tab content
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+                
+                // Invalidate map size to ensure proper rendering
+                if (tabId === 'outdoor') {
+                    setTimeout(() => {
+                        outdoorMap.invalidateSize();
+                    }, 100);
+                }
+            });
+        });
+        
+        // Refresh buttons
+        document.getElementById('refresh-outdoor').addEventListener('click', simulateFirebaseData);
+        document.getElementById('refresh-outdoor-table').addEventListener('click', simulateFirebaseData);
+        document.getElementById('refresh-indoor').addEventListener('click', simulateFirebaseData);
+        document.getElementById('refresh-indoor-table').addEventListener('click', simulateFirebaseData);
+        
+        // Initial data load
+        simulateFirebaseData();
+        
+        // Simulate data updates every 5 seconds
+        setInterval(simulateFirebaseData, 5000);
+    </script>
+</body>
+</html>
+

@@ -825,6 +825,60 @@
                 left: 20px;
                 right: 20px;
             }
+
+            /* Mobile form adjustments */
+            .add-log-form {
+                padding: 15px;
+            }
+            
+            .form-group input, 
+            .form-group select, 
+            .form-group textarea {
+                padding: 10px;
+            }
+            
+            .btn {
+                padding: 8px 16px;
+            }
+        }
+
+        /* Mobile tab dropdown */
+        .mobile-tabs {
+            display: none;
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: white;
+            font-size: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-tabs {
+                display: block;
+            }
+            .nav-tabs {
+                display: none;
+            }
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -848,12 +902,21 @@
                 </div>
             </div>
             
+            <select class="mobile-tabs" id="mobile-tabs">
+                <option value="outdoor">Outdoor Tracking</option>
+                <option value="indoor">Indoor Tracking</option>
+                <option value="maintenance">Maintenance Dashboard</option>
+            </select>
+            
             <div class="nav-tabs">
                 <div class="nav-tab active" data-tab="outdoor">Outdoor Tracking</div>
                 <div class="nav-tab" data-tab="indoor">Indoor Tracking</div>
                 <div class="nav-tab" data-tab="maintenance">Maintenance Dashboard</div>
             </div>
         </header>
+        
+        <!-- Loading indicator -->
+        <div class="spinner" id="loading-spinner"></div>
         
         <!-- Outdoor Tracking Tab -->
         <div class="tab-content active" id="outdoor-tab">
@@ -1151,6 +1214,10 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         
+        // Show loading spinner
+        const loadingSpinner = document.getElementById('loading-spinner');
+        loadingSpinner.style.display = 'block';
+        
         // Initialize outdoor map
         const outdoorMap = L.map('outdoor-map').setView([6.459631, 100.359825], 18);
 
@@ -1178,6 +1245,7 @@
         const saveGeofenceBtn = document.getElementById('save-geofence');
         const removeGeofenceBtn = document.getElementById('remove-geofence');
         const geofenceCenterMarker = document.getElementById('geofence-center-marker');
+        const mobileTabs = document.getElementById('mobile-tabs');
         
         // Data storage
         let outdoorMarkers = {};
@@ -1502,6 +1570,9 @@
             // Update device count and timestamp
             activeDevicesEl.textContent = activeCount;
             lastUpdateEl.textContent = new Date().toLocaleTimeString();
+            
+            // Hide loading spinner
+            loadingSpinner.style.display = 'none';
         }
         
         // Maintenance Dashboard Functions
@@ -1527,16 +1598,21 @@
                 timestamp: new Date().toISOString()
             };
             
+            // Show loading spinner
+            loadingSpinner.style.display = 'block';
+            
             // Save to Firebase
             const newLogRef = database.ref('/maintenance/logs').push();
             newLogRef.set(log)
                 .then(() => {
                     alert("Maintenance log added successfully!");
                     document.getElementById('maintenance-form').reset();
+                    loadingSpinner.style.display = 'none';
                 })
                 .catch(error => {
                     console.error("Error adding maintenance log:", error);
                     alert("Failed to add maintenance log. Please try again.");
+                    loadingSpinner.style.display = 'none';
                 });
         }
         
@@ -1621,33 +1697,49 @@ Description: ${log.description}`);
         }
         
         // Tab switching functionality
+        function switchTab(tabId) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.nav-tab').forEach(t => {
+                t.classList.remove('active');
+            });
+            
+            // Add active class to clicked tab
+            document.querySelector(`.nav-tab[data-tab="${tabId}"]`).classList.add('active');
+            
+            // Hide all tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+            
+            // Update mobile dropdown
+            if (mobileTabs) {
+                mobileTabs.value = tabId;
+            }
+            
+            // Invalidate map size to ensure proper rendering
+            if (tabId === 'outdoor') {
+                setTimeout(() => {
+                    outdoorMap.invalidateSize();
+                }, 100);
+            }
+        }
+        
         document.querySelectorAll('.nav-tab').forEach(tab => {
             tab.addEventListener('click', function() {
-                // Remove active class from all tabs
-                document.querySelectorAll('.nav-tab').forEach(t => {
-                    t.classList.remove('active');
-                });
-                
-                // Add active class to clicked tab
-                this.classList.add('active');
-                
-                // Hide all tab content
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                });
-                
-                // Show selected tab content
                 const tabId = this.getAttribute('data-tab');
-                document.getElementById(`${tabId}-tab`).classList.add('active');
-                
-                // Invalidate map size to ensure proper rendering
-                if (tabId === 'outdoor') {
-                    setTimeout(() => {
-                        outdoorMap.invalidateSize();
-                    }, 100);
-                }
+                switchTab(tabId);
             });
         });
+        
+        // Mobile tabs dropdown
+        if (mobileTabs) {
+            mobileTabs.addEventListener('change', function() {
+                switchTab(this.value);
+            });
+        }
         
         // Refresh buttons
         document.getElementById('refresh-outdoor').addEventListener('click', function() {
@@ -1796,6 +1888,7 @@ Description: ${log.description}`);
         database.ref('/maintenance/logs').on('value', snapshot => {
             const logs = snapshot.val() || {};
             updateMaintenanceDashboard(logs);
+            loadingSpinner.style.display = 'none';
         });
         
         // Maintenance form submit handler
@@ -1804,86 +1897,8 @@ Description: ${log.description}`);
             addMaintenanceLog();
         });
 
-        // Mobile-friendly tab toggle
+        // Mobile-friendly initialization
         $(document).ready(function () {
-            // Check if it's mobile view
-            function isMobile() {
-                return window.innerWidth <= 768;
-            }
-
-            $('.nav-tab').on('click', function () {
-                $('.nav-tab').removeClass('active');
-                $(this).addClass('active');
-
-                $('.tab-content').removeClass('active');
-                const tabId = $(this).data('tab');
-                $('#' + tabId + '-tab').addClass('active');
-
-                // Invalidate Leaflet map on mobile
-                if (tabId === 'outdoor' && typeof outdoorMap !== 'undefined') {
-                    setTimeout(() => {
-                        outdoorMap.invalidateSize();
-                    }, 100);
-                }
-            });
-
-            // Optional: Collapse nav tabs into dropdown on mobile
-            if (isMobile()) {
-                $('.nav-tabs').before('<select id="mobile-tabs" class="mobile-tabs"><option value="outdoor">Outdoor Tracking</option><option value="indoor">Indoor Tracking</option><option value="maintenance">Maintenance Dashboard</option></select>');
-                $('.nav-tabs').hide();
-
-                $('#mobile-tabs').on('change', function () {
-                    const tab = $(this).val();
-                    $('.nav-tab[data-tab="' + tab + '"]').click();
-                });
-            }
-            
-            /*// Add sample maintenance logs for demonstration
-            const sampleLogs = {
-                log1: {
-                    deviceId: "TAG-101",
-                    type: "complete",
-                    date: "2023-06-15",
-                    technician: "John Smith",
-                    description: "Replaced battery and updated firmware",
-                    timestamp: new Date("2023-06-15").toISOString()
-                },
-                log2: {
-                    deviceId: "ESP32-AMB-01",
-                    type: "ongoing",
-                    date: "2023-07-05",
-                    technician: "Sarah Johnson",
-                    description: "Diagnosing GPS connectivity issues",
-                    timestamp: new Date().toISOString()
-                },
-                log3: {
-                    deviceId: "TAG-103",
-                    type: "upcoming",
-                    date: "2023-07-20",
-                    technician: "Mike Chen",
-                    description: "Scheduled battery replacement",
-                    timestamp: new Date().toISOString()
-                },
-                log4: {
-                    deviceId: "ANC-B2",
-                    type: "complete",
-                    date: "2023-06-25",
-                    technician: "Emily Davis",
-                    description: "Calibrated anchor position sensors",
-                    timestamp: new Date("2023-06-25").toISOString()
-                },
-                log5: {
-                    deviceId: "ESP32-ICU-04",
-                    type: "upcoming",
-                    date: "2023-08-01",
-                    technician: "Robert Wilson",
-                    description: "Full system diagnostic and software update",
-                    timestamp: new Date().toISOString()
-                }
-            };*/
-            
-            updateMaintenanceDashboard(sampleLogs);
-            
             // Request notification permission
             if ('Notification' in window) {
                 Notification.requestPermission();

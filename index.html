@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         :root {
             --primary: #a7dca5;
@@ -21,6 +22,7 @@
             --gray: #6c757d;
             --light-gray: #e9ecef;
             --ocean: #e3f2fd;
+            --success: #4CAF50;
         }
         
         * {
@@ -100,7 +102,7 @@
             transition: all 0.3s;
             font-weight: 500;
         }
-        
+
         .nav-tab:hover {
             background-color: rgba(255,255,255,0.25);
         }
@@ -234,13 +236,6 @@
         
         .data-table tr:hover {
             background-color: #e8f4ff;
-        }
-        
-        .accuracy-circle {
-            stroke: #a4c6eb;
-            stroke-width: 2;
-            fill: rgba(255, 0, 0, 0.1);
-            pointer-events: none;
         }
         
         .device-marker {
@@ -530,10 +525,6 @@
                             <div class="legend-color" style="background-color: var(--primary);"></div>
                             <span>Device Location</span>
                         </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background-color: var(--danger);"></div>
-                            <span>Accuracy Circle (5m)</span>
-                        </div>
                     </div>
                 </div>
                 
@@ -649,8 +640,8 @@
         const database = firebase.database();
         
         // Initialize outdoor map
-        const outdoorMap = L.map('outdoor-map').setView([3.1390, 101.6869], 18);
-        
+        const outdoorMap = L.map('outdoor-map').setView([6.459631, 100.359825], 18);
+
         // Add OpenStreetMap tiles
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -663,6 +654,8 @@
         // Data storage
         let outdoorMarkers = {};
         let indoorTags = {};
+        let outdoorDevicesData = {};
+        let indoorDevicesData = {};
         
         // Anchor configuration for indoor map
         const anchorsConfig = [
@@ -859,94 +852,19 @@
             return "Hallway";
         }
         
-        // Simulate Firebase data for demonstration
-        function simulateFirebaseData() {
-            // Outdoor devices
-            const outdoorDevices = {
-                "ESP32-AMB-01": {
-                    id: "ESP32-AMB-01",
-                    lat: 3.1390 + (Math.random() - 0.5) * 0.0002,
-                    lng: 101.6869 + (Math.random() - 0.5) * 0.0002,
-                    accuracy: 5,
-                    status: "active",
-                    timestamp: Date.now()
-                },
-                "ESP32-VAN-02": {
-                    id: "ESP32-VAN-02",
-                    lat: 3.1402 + (Math.random() - 0.5) * 0.0002,
-                    lng: 101.6883 + (Math.random() - 0.5) * 0.0002,
-                    accuracy: 5,
-                    status: "active",
-                    timestamp: Date.now()
-                },
-                "ESP32-MON-03": {
-                    id: "ESP32-MON-03",
-                    lat: 3.1385 + (Math.random() - 0.5) * 0.0002,
-                    lng: 101.6852 + (Math.random() - 0.5) * 0.0002,
-                    accuracy: 5,
-                    status: "alert",
-                    timestamp: Date.now()
-                },
-                "ESP32-ICU-04": {
-                    id: "ESP32-ICU-04",
-                    lat: 3.1411 + (Math.random() - 0.5) * 0.0002,
-                    lng: 101.6876 + (Math.random() - 0.5) * 0.0002,
-                    accuracy: 5,
-                    status: "active",
-                    timestamp: Date.now()
-                }
-            };
-            
-            // Indoor devices
-            const indoorDevices = {
-                "TAG-101": {
-                    id: "TAG-101",
-                    anchorId: "ANC-A1",
-                    x: 25 + (Math.random() - 0.5) * 5,
-                    y: 30 + (Math.random() - 0.5) * 5,
-                    distance: (3.2 + (Math.random() - 0.5) * 0.5).toFixed(1),
-                    status: "normal",
-                    timestamp: Date.now()
-                },
-                "TAG-102": {
-                    id: "TAG-102",
-                    anchorId: "ANC-B2",
-                    x: 75 + (Math.random() - 0.5) * 5,
-                    y: 30 + (Math.random() - 0.5) * 5,
-                    distance: (1.8 + (Math.random() - 0.5) * 0.5).toFixed(1),
-                    status: "normal",
-                    timestamp: Date.now()
-                },
-                "TAG-103": {
-                    id: "TAG-103",
-                    anchorId: "ANC-C3",
-                    x: 30 + (Math.random() - 0.5) * 5,
-                    y: 60 + (Math.random() - 0.5) * 5,
-                    distance: (4.7 + (Math.random() - 0.5) * 0.5).toFixed(1),
-                    status: "alert",
-                    timestamp: Date.now()
-                },
-                "TAG-104": {
-                    id: "TAG-104",
-                    anchorId: "ANC-D4",
-                    x: 75 + (Math.random() - 0.5) * 5,
-                    y: 60 + (Math.random() - 0.5) * 5,
-                    distance: (2.1 + (Math.random() - 0.5) * 0.5).toFixed(1),
-                    status: "normal",
-                    timestamp: Date.now()
-                }
-            };
-            
-            // Update UI with simulated data
-            updateUIWithDevices(outdoorDevices, indoorDevices);
-        }
-        
         // Update UI with device data
         function updateUIWithDevices(outdoorDevices, indoorDevices) {
-            // Clear existing data
+            // Clear dynamic indoor elements (device markers, lines, labels)
+            const indoorGrid = document.querySelector('.indoor-grid');
+            if (indoorGrid) {
+                indoorGrid.querySelectorAll('.device-marker, .distance-line, .distance-label').forEach(el => {
+                    el.remove();
+                });
+            }
+            
+            // Clear tables
             document.getElementById('outdoor-table-body').innerHTML = '';
             document.getElementById('indoor-table-body').innerHTML = '';
-            initializeIndoorMap();
             
             // Update outdoor devices
             let activeCount = 0;
@@ -998,17 +916,90 @@
         });
         
         // Refresh buttons
-        document.getElementById('refresh-outdoor').addEventListener('click', simulateFirebaseData);
-        document.getElementById('refresh-outdoor-table').addEventListener('click', simulateFirebaseData);
-        document.getElementById('refresh-indoor').addEventListener('click', simulateFirebaseData);
-        document.getElementById('refresh-indoor-table').addEventListener('click', simulateFirebaseData);
+        document.getElementById('refresh-outdoor').addEventListener('click', function() {
+            updateUIWithDevices(outdoorDevicesData, indoorDevicesData);
+        });
+        document.getElementById('refresh-outdoor-table').addEventListener('click', function() {
+            updateUIWithDevices(outdoorDevicesData, indoorDevicesData);
+        });
+        document.getElementById('refresh-indoor').addEventListener('click', function() {
+            updateUIWithDevices(outdoorDevicesData, indoorDevicesData);
+        });
+        document.getElementById('refresh-indoor-table').addEventListener('click', function() {
+            updateUIWithDevices(outdoorDevicesData, indoorDevicesData);
+        });
         
-        // Initial data load
-        simulateFirebaseData();
+        // Firebase listeners
+        // Outdoor devices listener
+        database.ref('/outdoor/devices').on('value', snapshot => {
+            outdoorDevicesData = {};
+            snapshot.forEach(child => {
+                const key = child.key;
+                const data = child.val();
+                if (data) {
+                    // Add id to device data
+                    data.id = key;
+                    outdoorDevicesData[key] = data;
+                }
+            });
+            updateUIWithDevices(outdoorDevicesData, indoorDevicesData);
+        });
         
-        // Simulate data updates every 5 seconds
-        setInterval(simulateFirebaseData, 5000);
+        // Indoor devices listener
+        database.ref('/indoor/tags').on('value', snapshot => {
+            indoorDevicesData = {};
+            snapshot.forEach(child => {
+                const tagId = child.key;
+                const data = child.val();
+                if (data) {
+                    indoorDevicesData[tagId] = {
+                        id: data.deviceID || tagId,
+                        anchorId: data.anchor || "ANCHOR_01",
+                        x: data.x, 
+                        y: data.y,
+                        distance: data.distance || 0,
+                        status: data.status || "normal",
+                        timestamp: data.timestamp !== undefined ? data.timestamp : Date.now()
+                    };
+                }
+            });
+            updateUIWithDevices(outdoorDevicesData, indoorDevicesData);
+        });
+
+        // Mobile-friendly tab toggle
+        $(document).ready(function () {
+            // Check if it's mobile view
+            function isMobile() {
+                return window.innerWidth <= 768;
+            }
+
+            $('.nav-tab').on('click', function () {
+                $('.nav-tab').removeClass('active');
+                $(this).addClass('active');
+
+                $('.tab-content').removeClass('active');
+                const tabId = $(this).data('tab');
+                $('#' + tabId + '-tab').addClass('active');
+
+                // Invalidate Leaflet map on mobile
+                if (tabId === 'outdoor' && typeof outdoorMap !== 'undefined') {
+                    setTimeout(() => {
+                        outdoorMap.invalidateSize();
+                    }, 100);
+                }
+            });
+
+            // Optional: Collapse nav tabs into dropdown on mobile
+            if (isMobile()) {
+                $('.nav-tabs').before('<select id="mobile-tabs" class="mobile-tabs"><option value="outdoor">Outdoor Tracking</option><option value="indoor">Indoor Tracking</option></select>');
+                $('.nav-tabs').hide();
+
+                $('#mobile-tabs').on('change', function () {
+                    const tab = $(this).val();
+                    $('.nav-tab[data-tab="' + tab + '"]').click();
+                });
+            }
+        });
     </script>
 </body>
 </html>
-

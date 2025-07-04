@@ -1187,10 +1187,7 @@
         
         // Anchor configuration for indoor map
         const anchorsConfig = [
-            {id: "ANC-A1", top: "20%", left: "20%"},
-            {id: "ANC-B2", top: "20%", left: "70%"},
-            {id: "ANC-C3", top: "70%", left: "20%"},
-            {id: "ANC-D4", top: "70%", left: "70%"}
+            {id: "ANC-A1", top: "50%", left: "50%"},
         ];
         
         // Initialize indoor map
@@ -1217,10 +1214,7 @@
             
             // Add room labels
             const rooms = [
-                {name: "ER Room 1", top: "15%", left: "15%"},
-                {name: "ICU Section", top: "15%", left: "65%"},
-                {name: "Pediatrics", top: "65%", left: "15%"},
-                {name: "Surgery", top: "65%", left: "65%"}
+                {name: "Anchor 1", top: "50%", left: "50%"},
             ];
             
             rooms.forEach(room => {
@@ -1472,10 +1466,7 @@
         // Helper: Determine room based on position
         function getRoomForPosition(x, y) {
             // Example implementation - customize with your actual room coordinates
-            if (x < 40 && y < 40) return "ER Room 1";
-            if (x > 60 && y < 40) return "ICU Section";
-            if (x < 40 && y > 60) return "Pediatrics";
-            if (x > 60 && y > 60) return "Surgery";
+            if (x < 50 && y < 50) return "ER Room 1";
             return "Hallway";
         }
         
@@ -1847,7 +1838,7 @@ Description: ${log.description}`);
                 });
             }
             
-            // Add sample maintenance logs for demonstration
+            /*// Add sample maintenance logs for demonstration
             const sampleLogs = {
                 log1: {
                     deviceId: "TAG-101",
@@ -1889,7 +1880,7 @@ Description: ${log.description}`);
                     description: "Full system diagnostic and software update",
                     timestamp: new Date().toISOString()
                 }
-            };
+            };*/
             
             updateMaintenanceDashboard(sampleLogs);
             

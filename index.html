@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MEDI-TRACK - Real-Time Device Tracking</title>
+    <title>MEDI-TRACK - Advanced Geofencing</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -23,6 +23,9 @@
             --light-gray: #e9ecef;
             --ocean: #e3f2fd;
             --success: #4CAF50;
+            --info: #17a2b8;
+            --purple: #6f42c1;
+            --geofence: #ff7800;
         }
         
         * {
@@ -439,6 +442,330 @@
             background: var(--primary-dark);
         }
         
+        /* Maintenance Dashboard Styles */
+        .maintenance-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .maintenance-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        
+        .maintenance-card .header {
+            padding: 15px 20px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .complete .header { background-color: rgba(76, 175, 80, 0.2); }
+        .ongoing .header { background-color: rgba(23, 162, 184, 0.2); }
+        .upcoming .header { background-color: rgba(111, 66, 193, 0.2); }
+        
+        .maintenance-card .count {
+            background: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .maintenance-card .content {
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .maintenance-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        .maintenance-table th {
+            text-align: left;
+            padding: 10px;
+            border-bottom: 2px solid var(--light-gray);
+        }
+        
+        .maintenance-table td {
+            padding: 10px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .maintenance-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .add-log-form {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .form-title {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px;
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background-color: var(--gray);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .maintenance-status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .status-complete {
+            background-color: rgba(76, 175, 80, 0.15);
+            color: var(--success);
+        }
+        
+        .status-ongoing {
+            background-color: rgba(23, 162, 184, 0.15);
+            color: var(--info);
+        }
+        
+        .status-upcoming {
+            background-color: rgba(111, 66, 193, 0.15);
+            color: var(--purple);
+        }
+        
+        /* Geofence Alert Styles */
+        .geofence-alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--danger);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        .geofence-alert i {
+            font-size: 1.5rem;
+        }
+        
+        .geofence-alert-content {
+            flex: 1;
+        }
+        
+        .geofence-alert-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .geofence-alert-close {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0 5px;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        /* Geofence Configuration Panel */
+        .geofence-panel {
+            position: absolute;
+            top: 70px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.92);
+            padding: 16px;
+            border-radius: 10px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 1px solid var(--light-gray);
+            width: 300px;
+            max-height: 90%;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .geofence-panel.active {
+            display: block;
+        }
+        
+        .geofence-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .geofence-header h3 {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .geofence-close {
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 1.3rem;
+        }
+        
+        .geofence-form-group {
+            margin-bottom: 15px;
+        }
+        
+        .geofence-form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .geofence-form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .radius-slider {
+            width: 100%;
+            margin: 15px 0;
+        }
+        
+        .radius-value {
+            text-align: center;
+            font-weight: 500;
+            margin-top: 5px;
+            color: var(--primary);
+        }
+        
+        .geofence-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .geofence-actions .btn {
+            flex: 1;
+        }
+        
+        .geofence-center-marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: transparent;
+            border: 3px solid var(--geofence);
+            transform: translate(-50%, -50%);
+            z-index: 999;
+            display: none;
+        }
+        
+        .geofence-center-marker::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            background-color: var(--geofence);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
         /* Responsive styles */
         @media (max-width: 1200px) {
             .tab-body {
@@ -447,6 +774,10 @@
             
             .map-container, .data-table-container {
                 height: 400px;
+            }
+            
+            .maintenance-grid {
+                grid-template-columns: 1fr;
             }
         }
         
@@ -476,6 +807,24 @@
             .tab-body {
                 padding: 15px;
             }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .geofence-alert {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                width: calc(100% - 20px);
+            }
+            
+            .geofence-panel {
+                width: calc(100% - 40px);
+                top: 60px;
+                left: 20px;
+                right: 20px;
+            }
         }
     </style>
 </head>
@@ -502,6 +851,7 @@
             <div class="nav-tabs">
                 <div class="nav-tab active" data-tab="outdoor">Outdoor Tracking</div>
                 <div class="nav-tab" data-tab="indoor">Indoor Tracking</div>
+                <div class="nav-tab" data-tab="maintenance">Maintenance Dashboard</div>
             </div>
         </header>
         
@@ -514,9 +864,14 @@
                 <div class="map-container">
                     <div class="header">
                         <span>World Map with Device Locations</span>
-                        <button class="refresh-btn" id="refresh-outdoor">
-                            <i class="fas fa-sync"></i> Refresh
-                        </button>
+                        <div>
+                            <button class="btn btn-secondary" id="set-geofence-btn">
+                                <i class="fas fa-draw-polygon"></i> Configure Geofence
+                            </button>
+                            <button class="refresh-btn" id="refresh-outdoor">
+                                <i class="fas fa-sync"></i> Refresh
+                            </button>
+                        </div>
                     </div>
                     <div id="outdoor-map"></div>
                     <div class="map-legend">
@@ -525,7 +880,48 @@
                             <div class="legend-color" style="background-color: var(--primary);"></div>
                             <span>Device Location</span>
                         </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: var(--geofence);"></div>
+                            <span>Geofence Area</span>
+                        </div>
                     </div>
+                    
+                    <!-- Geofence configuration panel -->
+                    <div class="geofence-panel" id="geofence-panel">
+                        <div class="geofence-header">
+                            <h3><i class="fas fa-fence"></i> Geofence Configuration</h3>
+                            <button class="geofence-close" id="close-geofence-panel">&times;</button>
+                        </div>
+                        
+                        <div class="geofence-form-group">
+                            <label for="geofence-lat">Latitude</label>
+                            <input type="number" id="geofence-lat" step="0.000001" placeholder="Enter latitude">
+                        </div>
+                        
+                        <div class="geofence-form-group">
+                            <label for="geofence-lng">Longitude</label>
+                            <input type="number" id="geofence-lng" step="0.000001" placeholder="Enter longitude">
+                        </div>
+                        
+                        <div class="geofence-form-group">
+                            <label for="geofence-radius">Radius: <span id="radius-value">500</span> meters</label>
+                            <input type="range" id="geofence-radius" class="radius-slider" min="50" max="2000" value="500" step="50">
+                        </div>
+                        
+                        <p class="help-text"><i class="fas fa-info-circle"></i> Click on the map to set center location</p>
+                        
+                        <div class="geofence-actions">
+                            <button class="btn btn-secondary" id="remove-geofence">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                            <button class="btn btn-primary" id="save-geofence">
+                                <i class="fas fa-save"></i> Save
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Center marker for geofence setup -->
+                    <div class="geofence-center-marker" id="geofence-center-marker"></div>
                 </div>
                 
                 <div class="data-table-container">
@@ -544,6 +940,7 @@
                                 <th>Longitude</th>
                                 <th>Accuracy</th>
                                 <th>Status</th>
+                                <th>Geofence</th>
                             </tr>
                         </thead>
                         <tbody id="outdoor-table-body">
@@ -616,6 +1013,121 @@
             </div>
         </div>
         
+        <!-- Maintenance Dashboard Tab -->
+        <div class="tab-content" id="maintenance-tab">
+            <div class="tab-header">
+                <i class="fas fa-tools"></i> Maintenance Dashboard
+            </div>
+            <div class="tab-body">
+                <div class="add-log-form">
+                    <h2 class="form-title"><i class="fas fa-plus-circle"></i> Add New Maintenance Log</h2>
+                    <form id="maintenance-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="device-id">Device ID</label>
+                                <input type="text" id="device-id" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="maintenance-type">Maintenance Type</label>
+                                <select id="maintenance-type" required>
+                                    <option value="">Select Type</option>
+                                    <option value="upcoming">Upcoming</option>
+                                    <option value="ongoing">Ongoing</option>
+                                    <option value="complete">Complete</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="scheduled-date">Scheduled Date</label>
+                                <input type="date" id="scheduled-date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="assigned-technician">Assigned Technician</label>
+                                <input type="text" id="assigned-technician" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea id="description" required></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="reset" class="btn btn-secondary">Clear</button>
+                            <button type="submit" class="btn btn-primary">Add Log</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="maintenance-grid">
+                    <div class="maintenance-card complete">
+                        <div class="header">
+                            <span>Complete Maintenance</span>
+                            <div class="count" id="complete-count">0</div>
+                        </div>
+                        <div class="content">
+                            <table class="maintenance-table" id="complete-table">
+                                <thead>
+                                    <tr>
+                                        <th>Device ID</th>
+                                        <th>Completed</th>
+                                        <th>Technician</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Complete logs will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="maintenance-card ongoing">
+                        <div class="header">
+                            <span>Ongoing Maintenance</span>
+                            <div class="count" id="ongoing-count">0</div>
+                        </div>
+                        <div class="content">
+                            <table class="maintenance-table" id="ongoing-table">
+                                <thead>
+                                    <tr>
+                                        <th>Device ID</th>
+                                        <th>Started</th>
+                                        <th>Technician</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Ongoing logs will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="maintenance-card upcoming">
+                        <div class="header">
+                            <span>Upcoming Maintenance</span>
+                            <div class="count" id="upcoming-count">0</div>
+                        </div>
+                        <div class="content">
+                            <table class="maintenance-table" id="upcoming-table">
+                                <thead>
+                                    <tr>
+                                        <th>Device ID</th>
+                                        <th>Scheduled</th>
+                                        <th>Technician</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Upcoming logs will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <footer>
             <p>MEDI-TRACK Smart Tracking System | Real-time Indoor/Outdoor Monitoring | Firebase Integration</p>
             <p>Connected to Firebase Project: medi-track-demo</p>
@@ -647,9 +1159,25 @@
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(outdoorMap);
         
+        // Geofencing variables
+        let geofenceCenter = [6.459631, 100.359825]; // Default center
+        let geofenceRadius = 500; // 500 meters
+        let geofenceCircle = null;
+        let geofenceAlerts = {};
+        
         // DOM Elements
         const lastUpdateEl = document.getElementById('last-update');
         const activeDevicesEl = document.getElementById('active-devices');
+        const setGeofenceBtn = document.getElementById('set-geofence-btn');
+        const geofencePanel = document.getElementById('geofence-panel');
+        const closeGeofencePanel = document.getElementById('close-geofence-panel');
+        const geofenceLat = document.getElementById('geofence-lat');
+        const geofenceLng = document.getElementById('geofence-lng');
+        const geofenceRadiusSlider = document.getElementById('geofence-radius');
+        const radiusValue = document.getElementById('radius-value');
+        const saveGeofenceBtn = document.getElementById('save-geofence');
+        const removeGeofenceBtn = document.getElementById('remove-geofence');
+        const geofenceCenterMarker = document.getElementById('geofence-center-marker');
         
         // Data storage
         let outdoorMarkers = {};
@@ -715,11 +1243,93 @@
             });
         }
         
+        // Create geofence on the map
+        function createGeofence(center, radius) {
+            // Remove existing geofence if any
+            if (geofenceCircle) {
+                outdoorMap.removeLayer(geofenceCircle);
+            }
+            
+            // Create new geofence
+            geofenceCircle = L.circle(center, {
+                color: '#ff7800',
+                fillColor: '#ff7800',
+                fillOpacity: 0.1,
+                radius: radius
+            }).addTo(outdoorMap);
+            
+            // Add popup with geofence info
+            geofenceCircle.bindPopup(`Geofence (${radius}m radius)`).openPopup();
+        }
+        
+        // Check if device is inside geofence
+        function isInsideGeofence(lat, lng) {
+            if (!geofenceCircle) return true;
+            
+            const devicePoint = L.latLng(lat, lng);
+            const centerPoint = geofenceCircle.getLatLng();
+            const distance = centerPoint.distanceTo(devicePoint);
+            
+            return distance <= geofenceCircle.getRadius();
+        }
+        
+        // Show geofence alert notification
+        function showGeofenceAlert(deviceId) {
+            // Check if we've already shown an alert for this device
+            if (geofenceAlerts[deviceId]) return;
+            
+            geofenceAlerts[deviceId] = true;
+            
+            // Create alert element
+            const alertEl = document.createElement('div');
+            alertEl.className = 'geofence-alert';
+            alertEl.innerHTML = `
+                <i class="fas fa-exclamation-triangle"></i>
+                <div class="geofence-alert-content">
+                    <div class="geofence-alert-title">Geofence Alert</div>
+                    <div>Device ${deviceId} has left the geofence area!</div>
+                </div>
+                <button class="geofence-alert-close">&times;</button>
+            `;
+            
+            document.body.appendChild(alertEl);
+            
+            // Add close functionality
+            alertEl.querySelector('.geofence-alert-close').addEventListener('click', () => {
+                alertEl.remove();
+            });
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (document.body.contains(alertEl)) {
+                    alertEl.remove();
+                }
+            }, 5000);
+            
+            // Show browser notification if supported
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('Geofence Alert', {
+                    body: `Device ${deviceId} has left the geofence area!`,
+                    icon: 'https://cdn-icons-png.flaticon.com/512/149/149071.png'
+                });
+            }
+        }
+        
+        // Update geofence center marker position
+        function updateGeofenceMarker(lat, lng) {
+            const point = outdoorMap.latLngToLayerPoint([lat, lng]);
+            geofenceCenterMarker.style.display = 'block';
+            geofenceCenterMarker.style.left = `${point.x}px`;
+            geofenceCenterMarker.style.top = `${point.y}px`;
+        }
+        
         // Initialize the indoor map
         initializeIndoorMap();
         
         // Update outdoor map markers
         function updateOutdoorMarker(key, device) {
+            const isInside = isInsideGeofence(device.lat, device.lng);
+            
             if (!outdoorMarkers[key]) {
                 // Create new marker
                 outdoorMarkers[key] = {
@@ -727,8 +1337,8 @@
                         title: device.id
                     }).addTo(outdoorMap),
                     circle: L.circle([device.lat, device.lng], {
-                        color: device.status === "alert" ? 'red' : 'blue',
-                        fillColor: device.status === "alert" ? '#f03' : '#03f',
+                        color: device.status === "alert" ? 'red' : (isInside ? 'blue' : 'red'),
+                        fillColor: device.status === "alert" ? '#f03' : (isInside ? '#03f' : '#f03'),
                         fillOpacity: 0.2,
                         radius: device.accuracy || 5
                     }).addTo(outdoorMap)
@@ -738,16 +1348,31 @@
                 outdoorMarkers[key].marker.bindPopup(`
                     <b>${device.id}</b><br>
                     Location: ${device.lat.toFixed(4)}° N, ${device.lng.toFixed(4)}° E<br>
-                    Status: ${device.status === "alert" ? '<span style="color:red">Alert</span>' : 'Active'}
+                    Status: ${device.status === "alert" ? '<span style="color:red">Alert</span>' : 'Active'}<br>
+                    Geofence: ${isInside ? 'Inside' : '<span style="color:red">Outside</span>'}
                 `);
             } else {
                 // Update existing marker
                 outdoorMarkers[key].marker.setLatLng([device.lat, device.lng]);
                 outdoorMarkers[key].circle.setLatLng([device.lat, device.lng]);
                 outdoorMarkers[key].circle.setStyle({
-                    color: device.status === "alert" ? 'red' : 'blue',
-                    fillColor: device.status === "alert" ? '#f03' : '#03f'
+                    color: device.status === "alert" ? 'red' : (isInside ? 'blue' : 'red'),
+                    fillColor: device.status === "alert" ? '#f03' : (isInside ? '#03f' : '#f03')
                 });
+                
+                // Update popup
+                const isInsideNow = isInsideGeofence(device.lat, device.lng);
+                outdoorMarkers[key].marker.setPopupContent(`
+                    <b>${device.id}</b><br>
+                    Location: ${device.lat.toFixed(4)}° N, ${device.lng.toFixed(4)}° E<br>
+                    Status: ${device.status === "alert" ? '<span style="color:red">Alert</span>' : 'Active'}<br>
+                    Geofence: ${isInsideNow ? 'Inside' : '<span style="color:red">Outside</span>'}
+                `);
+            }
+            
+            // Check geofence status and show alert if outside
+            if (!isInside) {
+                showGeofenceAlert(device.id);
             }
         }
         
@@ -807,14 +1432,16 @@
             }
             
             const timestamp = new Date(device.timestamp).toLocaleString();
+            const isInside = isInsideGeofence(device.lat, device.lng);
             
             row.innerHTML = `
-                <td><span class="status-indicator ${device.status === "alert" ? "alert" : ""}"></span> ${device.id}</td>
+                <td><span class="status-indicator ${device.status === "alert" || !isInside ? "alert" : ""}"></span> ${device.id}</td>
                 <td>${timestamp}</td>
                 <td>${device.lat.toFixed(6)}° N</td>
                 <td>${device.lng.toFixed(6)}° E</td>
                 <td>${device.accuracy || 5}m</td>
                 <td><span class="status-badge ${device.status === "alert" ? "status-alert" : "status-normal"}">${device.status === "alert" ? "⚠️ Alert" : "✅ Normal"}</span></td>
+                <td><span class="status-badge ${isInside ? "status-normal" : "status-alert"}">${isInside ? "✅ Inside" : "⚠️ Outside"}</span></td>
             `;
         }
         
@@ -886,6 +1513,122 @@
             lastUpdateEl.textContent = new Date().toLocaleTimeString();
         }
         
+        // Maintenance Dashboard Functions
+        function addMaintenanceLog() {
+            const deviceId = document.getElementById('device-id').value;
+            const type = document.getElementById('maintenance-type').value;
+            const date = document.getElementById('scheduled-date').value;
+            const technician = document.getElementById('assigned-technician').value;
+            const description = document.getElementById('description').value;
+            
+            if (!deviceId || !type || !date || !technician || !description) {
+                alert("Please fill all fields");
+                return;
+            }
+            
+            // Create maintenance log object
+            const log = {
+                deviceId,
+                type,
+                date,
+                technician,
+                description,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Save to Firebase
+            const newLogRef = database.ref('/maintenance/logs').push();
+            newLogRef.set(log)
+                .then(() => {
+                    alert("Maintenance log added successfully!");
+                    document.getElementById('maintenance-form').reset();
+                })
+                .catch(error => {
+                    console.error("Error adding maintenance log:", error);
+                    alert("Failed to add maintenance log. Please try again.");
+                });
+        }
+        
+        function updateMaintenanceDashboard(logs) {
+            const completeLogs = [];
+            const ongoingLogs = [];
+            const upcomingLogs = [];
+            
+            // Organize logs by type
+            Object.values(logs).forEach(log => {
+                if (log.type === 'complete') {
+                    completeLogs.push(log);
+                } else if (log.type === 'ongoing') {
+                    ongoingLogs.push(log);
+                } else if (log.type === 'upcoming') {
+                    upcomingLogs.push(log);
+                }
+            });
+            
+            // Update counts
+            document.getElementById('complete-count').textContent = completeLogs.length;
+            document.getElementById('ongoing-count').textContent = ongoingLogs.length;
+            document.getElementById('upcoming-count').textContent = upcomingLogs.length;
+            
+            // Update tables
+            updateMaintenanceTable('complete-table', completeLogs);
+            updateMaintenanceTable('ongoing-table', ongoingLogs);
+            updateMaintenanceTable('upcoming-table', upcomingLogs);
+        }
+        
+        function updateMaintenanceTable(tableId, logs) {
+            const table = document.getElementById(tableId);
+            const tbody = table.querySelector('tbody');
+            tbody.innerHTML = '';
+            
+            logs.forEach(log => {
+                const row = document.createElement('tr');
+                
+                // Format date based on status
+                let dateField;
+                if (log.type === 'complete') {
+                    dateField = new Date(log.timestamp).toLocaleDateString();
+                } else if (log.type === 'ongoing') {
+                    dateField = new Date(log.timestamp).toLocaleDateString();
+                } else {
+                    dateField = log.date;
+                }
+                
+                // Status badge
+                let statusBadge;
+                if (log.type === 'complete') {
+                    statusBadge = '<span class="maintenance-status status-complete">Complete</span>';
+                } else if (log.type === 'ongoing') {
+                    statusBadge = '<span class="maintenance-status status-ongoing">In Progress</span>';
+                } else {
+                    statusBadge = '<span class="maintenance-status status-upcoming">Scheduled</span>';
+                }
+                
+                row.innerHTML = `
+                    <td>${log.deviceId}</td>
+                    <td>${dateField}</td>
+                    <td>${log.technician}</td>
+                    <td>${statusBadge}</td>
+                `;
+                
+                // Add click event to show details
+                row.addEventListener('click', () => {
+                    showMaintenanceDetails(log);
+                });
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        function showMaintenanceDetails(log) {
+            alert(`Maintenance Details:
+Device ID: ${log.deviceId}
+Type: ${log.type.charAt(0).toUpperCase() + log.type.slice(1)}
+Date: ${log.date}
+Technician: ${log.technician}
+Description: ${log.description}`);
+        }
+        
         // Tab switching functionality
         document.querySelectorAll('.nav-tab').forEach(tab => {
             tab.addEventListener('click', function() {
@@ -929,6 +1672,98 @@
             updateUIWithDevices(outdoorDevicesData, indoorDevicesData);
         });
         
+        // Set geofence button
+        setGeofenceBtn.addEventListener('click', function() {
+            geofencePanel.classList.toggle('active');
+            if (geofencePanel.classList.contains('active')) {
+                // Populate form with current values
+                geofenceLat.value = geofenceCenter[0];
+                geofenceLng.value = geofenceCenter[1];
+                geofenceRadiusSlider.value = geofenceRadius;
+                radiusValue.textContent = geofenceRadius;
+                
+                // Show center marker
+                updateGeofenceMarker(geofenceCenter[0], geofenceCenter[1]);
+            } else {
+                geofenceCenterMarker.style.display = 'none';
+            }
+        });
+        
+        // Close geofence panel
+        closeGeofencePanel.addEventListener('click', function() {
+            geofencePanel.classList.remove('active');
+            geofenceCenterMarker.style.display = 'none';
+        });
+        
+        // Save geofence
+        saveGeofenceBtn.addEventListener('click', function() {
+            const lat = parseFloat(geofenceLat.value);
+            const lng = parseFloat(geofenceLng.value);
+            const radius = parseInt(geofenceRadiusSlider.value);
+            
+            if (isNaN(lat)) {
+                alert("Please enter a valid latitude");
+                return;
+            }
+            
+            if (isNaN(lng)) {
+                alert("Please enter a valid longitude");
+                return;
+            }
+            
+            geofenceCenter = [lat, lng];
+            geofenceRadius = radius;
+            
+            createGeofence(geofenceCenter, geofenceRadius);
+            geofenceAlerts = {}; // Reset alerts
+            
+            // Close panel
+            geofencePanel.classList.remove('active');
+            geofenceCenterMarker.style.display = 'none';
+            
+            // Update UI with new geofence
+            updateUIWithDevices(outdoorDevicesData, indoorDevicesData);
+        });
+        
+        // Remove geofence
+        removeGeofenceBtn.addEventListener('click', function() {
+            if (geofenceCircle) {
+                outdoorMap.removeLayer(geofenceCircle);
+                geofenceCircle = null;
+                geofenceAlerts = {}; // Reset alerts
+                
+                // Update UI
+                updateUIWithDevices(outdoorDevicesData, indoorDevicesData);
+            }
+            
+            // Close panel
+            geofencePanel.classList.remove('active');
+            geofenceCenterMarker.style.display = 'none';
+        });
+        
+        // Update radius value display
+        geofenceRadiusSlider.addEventListener('input', function() {
+            radiusValue.textContent = this.value;
+        });
+        
+        // Map click handler for setting geofence center
+        outdoorMap.on('click', function(e) {
+            if (geofencePanel.classList.contains('active')) {
+                const lat = e.latlng.lat;
+                const lng = e.latlng.lng;
+                
+                // Update form values
+                geofenceLat.value = lat;
+                geofenceLng.value = lng;
+                
+                // Update marker position
+                updateGeofenceMarker(lat, lng);
+            }
+        });
+        
+        // Create initial geofence
+        createGeofence(geofenceCenter, geofenceRadius);
+        
         // Firebase listeners
         // Outdoor devices listener
         database.ref('/outdoor/devices').on('value', snapshot => {
@@ -965,6 +1800,18 @@
             });
             updateUIWithDevices(outdoorDevicesData, indoorDevicesData);
         });
+        
+        // Maintenance logs listener
+        database.ref('/maintenance/logs').on('value', snapshot => {
+            const logs = snapshot.val() || {};
+            updateMaintenanceDashboard(logs);
+        });
+        
+        // Maintenance form submit handler
+        document.getElementById('maintenance-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            addMaintenanceLog();
+        });
 
         // Mobile-friendly tab toggle
         $(document).ready(function () {
@@ -991,13 +1838,64 @@
 
             // Optional: Collapse nav tabs into dropdown on mobile
             if (isMobile()) {
-                $('.nav-tabs').before('<select id="mobile-tabs" class="mobile-tabs"><option value="outdoor">Outdoor Tracking</option><option value="indoor">Indoor Tracking</option></select>');
+                $('.nav-tabs').before('<select id="mobile-tabs" class="mobile-tabs"><option value="outdoor">Outdoor Tracking</option><option value="indoor">Indoor Tracking</option><option value="maintenance">Maintenance Dashboard</option></select>');
                 $('.nav-tabs').hide();
 
                 $('#mobile-tabs').on('change', function () {
                     const tab = $(this).val();
                     $('.nav-tab[data-tab="' + tab + '"]').click();
                 });
+            }
+            
+            // Add sample maintenance logs for demonstration
+            const sampleLogs = {
+                log1: {
+                    deviceId: "TAG-101",
+                    type: "complete",
+                    date: "2023-06-15",
+                    technician: "John Smith",
+                    description: "Replaced battery and updated firmware",
+                    timestamp: new Date("2023-06-15").toISOString()
+                },
+                log2: {
+                    deviceId: "ESP32-AMB-01",
+                    type: "ongoing",
+                    date: "2023-07-05",
+                    technician: "Sarah Johnson",
+                    description: "Diagnosing GPS connectivity issues",
+                    timestamp: new Date().toISOString()
+                },
+                log3: {
+                    deviceId: "TAG-103",
+                    type: "upcoming",
+                    date: "2023-07-20",
+                    technician: "Mike Chen",
+                    description: "Scheduled battery replacement",
+                    timestamp: new Date().toISOString()
+                },
+                log4: {
+                    deviceId: "ANC-B2",
+                    type: "complete",
+                    date: "2023-06-25",
+                    technician: "Emily Davis",
+                    description: "Calibrated anchor position sensors",
+                    timestamp: new Date("2023-06-25").toISOString()
+                },
+                log5: {
+                    deviceId: "ESP32-ICU-04",
+                    type: "upcoming",
+                    date: "2023-08-01",
+                    technician: "Robert Wilson",
+                    description: "Full system diagnostic and software update",
+                    timestamp: new Date().toISOString()
+                }
+            };
+            
+            updateMaintenanceDashboard(sampleLogs);
+            
+            // Request notification permission
+            if ('Notification' in window) {
+                Notification.requestPermission();
             }
         });
     </script>

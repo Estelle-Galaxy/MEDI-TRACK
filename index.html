@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>MEDI-TRACK - Mobile App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEDI-TRACK - Enhanced Calendar</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -33,7 +33,6 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            -webkit-tap-highlight-color: transparent;
         }
         
         body {
@@ -41,29 +40,23 @@
             color: var(--dark);
             line-height: 1.6;
             min-height: 100vh;
-            padding: 10px;
-            overflow-x: hidden;
-            touch-action: manipulation;
+            padding: 20px;
         }
         
         .container {
-            max-width: 100%;
+            max-width: 1600px;
             margin: 0 auto;
             background: white;
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             overflow: hidden;
-            position: relative;
         }
         
         header {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: #fff;
-            padding: 1rem 1rem;
+            padding: 1rem 2rem;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
         }
         
         .header-content {
@@ -75,25 +68,25 @@
         .logo {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
         }
         
         .logo h1 {
             font-weight: 700;
-            font-size: 1.4rem;
+            font-size: 1.8rem;
             letter-spacing: 0.5px;
         }
         
         .logo-icon {
             background-color: #fff;
             color: var(--primary);
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
@@ -101,25 +94,16 @@
             display: flex;
             gap: 5px;
             margin-top: 15px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            padding-bottom: 5px;
-        }
-        
-        .nav-tabs::-webkit-scrollbar {
-            display: none;
         }
         
         .nav-tab {
             background-color: rgba(255,255,255,0.15);
-            padding: 8px 16px;
+            padding: 10px 24px;
             border-radius: 20px 20px 0 0;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             transition: all 0.3s;
             font-weight: 500;
-            white-space: nowrap;
         }
 
         .nav-tab:hover {
@@ -136,35 +120,33 @@
         .status-bar {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 0.85rem;
+            gap: 20px;
         }
         
         .last-update {
             background-color: rgba(255,255,255,0.15);
-            padding: 6px 12px;
+            padding: 8px 15px;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
         
         .device-count {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             background-color: rgba(255,255,255,0.15);
-            padding: 6px 12px;
+            padding: 8px 15px;
             border-radius: 20px;
-            font-size: 0.8rem;
         }
         
         .tab-content {
             display: none;
             background: white;
             overflow: hidden;
-            margin-top: 10px;
+            margin-top: 20px;
         }
         
         .tab-content.active {
@@ -174,29 +156,16 @@
         .tab-header {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            padding: 12px 15px;
-            font-size: 1.1rem;
+            padding: 16px 20px;
+            font-size: 1.3rem;
             font-weight: 600;
         }
         
         .tab-body {
-            padding: 15px;
+            padding: 20px;
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-        }
-        
-        .tab-body::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .tab-section {
-            min-width: 95vw;
-            padding: 0 5px;
-            margin-bottom: 15px;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
         
         .map-container {
@@ -204,24 +173,23 @@
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             overflow: hidden;
-            height: 350px;
+            height: 500px;
             position: relative;
         }
         
         .map-container .header {
-            padding: 10px 15px;
+            padding: 12px 20px;
             border-bottom: 1px solid var(--light-gray);
             font-weight: 600;
             background-color: var(--light);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.9rem;
         }
         
         #outdoor-map, #indoor-map {
             width: 100%;
-            height: calc(100% - 40px);
+            height: calc(100% - 45px);
         }
         
         .data-table-container {
@@ -229,20 +197,19 @@
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             overflow: hidden;
-            height: 400px;
+            height: 500px;
             display: flex;
             flex-direction: column;
         }
         
         .data-table-container .header {
-            padding: 10px 15px;
+            padding: 12px 20px;
             border-bottom: 1px solid var(--light-gray);
             font-weight: 600;
             background-color: var(--light);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.9rem;
         }
         
         .data-table {
@@ -250,21 +217,19 @@
             border-collapse: collapse;
             flex: 1;
             overflow-y: auto;
-            font-size: 0.85rem;
         }
         
         .data-table th {
             background-color: var(--primary);
             color: white;
-            padding: 10px 12px;
+            padding: 12px 15px;
             text-align: left;
             position: sticky;
             top: 0;
-            font-size: 0.9rem;
         }
         
         .data-table td {
-            padding: 8px 12px;
+            padding: 10px 15px;
             border-bottom: 1px solid var(--light-gray);
         }
         
@@ -278,8 +243,8 @@
         
         .device-marker {
             position: absolute;
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             background-color: var(--primary);
             border: 2px solid white;
@@ -291,7 +256,7 @@
             justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
         }
         
         .device-marker.alert {
@@ -307,8 +272,8 @@
         
         .anchor-point {
             position: absolute;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             background-color: var(--secondary);
             border: 2px solid white;
@@ -324,35 +289,35 @@
         
         .map-legend {
             position: absolute;
-            bottom: 15px;
-            right: 15px;
+            bottom: 20px;
+            right: 20px;
             background: rgba(255, 255, 255, 0.92);
-            padding: 10px 12px;
-            border-radius: 8px;
+            padding: 12px 16px;
+            border-radius: 10px;
             z-index: 1000;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             border: 1px solid var(--light-gray);
         }
         
         .legend-title {
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             color: var(--primary);
-            font-size: 0.9rem;
+            font-size: 1rem;
         }
         
         .legend-item {
             display: flex;
             align-items: center;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
         
         .legend-color {
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
-            margin-right: 8px;
+            margin-right: 10px;
             border: 2px solid white;
             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
@@ -385,9 +350,9 @@
         .room-label {
             position: absolute;
             background: rgba(255, 255, 255, 0.8);
-            padding: 3px 6px;
+            padding: 4px 8px;
             border-radius: 4px;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-weight: 500;
             border: 1px solid var(--primary);
         }
@@ -402,21 +367,21 @@
         .distance-label {
             position: absolute;
             background: rgba(255, 255, 255, 0.9);
-            padding: 2px 5px;
+            padding: 2px 6px;
             border-radius: 4px;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             transform: translate(-50%, -100%);
             color: var(--danger);
             font-weight: 500;
         }
         
         .status-indicator {
-            width: 12px;
-            height: 12px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
             background-color: var(--success);
             display: inline-block;
-            margin-right: 6px;
+            margin-right: 8px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
         
@@ -436,21 +401,19 @@
         
         footer {
             background: white;
-            padding: 15px;
+            padding: 20px;
             text-align: center;
             color: var(--gray);
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
-            word-wrap: break-word;
         }
         
         /* Status badges */
         .status-badge {
-            padding: 4px 8px;
+            padding: 4px 10px;
             border-radius: 20px;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-weight: 500;
-            white-space: nowrap;
         }
         
         .status-normal {
@@ -469,8 +432,8 @@
             color: white;
             border: none;
             border-radius: 20px;
-            padding: 5px 10px;
-            font-size: 0.8rem;
+            padding: 6px 12px;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: background 0.3s;
         }
@@ -482,9 +445,9 @@
         /* Maintenance Dashboard Styles */
         .maintenance-grid {
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
         }
         
         .maintenance-card {
@@ -495,9 +458,9 @@
         }
         
         .maintenance-card .header {
-            padding: 12px 15px;
+            padding: 15px 20px;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 1.1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -509,37 +472,36 @@
         
         .maintenance-card .count {
             background: white;
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
         }
         
         .maintenance-card .content {
-            padding: 12px;
-            max-height: 250px;
+            padding: 15px;
+            max-height: 300px;
             overflow-y: auto;
         }
         
         .maintenance-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
         }
         
         .maintenance-table th {
             text-align: left;
-            padding: 8px;
+            padding: 10px;
             border-bottom: 2px solid var(--light-gray);
-            font-size: 0.9rem;
         }
         
         .maintenance-table td {
-            padding: 8px;
+            padding: 10px;
             border-bottom: 1px solid var(--light-gray);
         }
         
@@ -551,24 +513,24 @@
             background: white;
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            padding: 15px;
-            margin-bottom: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
         }
         
         .form-title {
-            font-size: 1.1rem;
-            margin-bottom: 15px;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
             color: var(--primary);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
         
         .form-row {
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            margin-bottom: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
         }
         
         .form-group {
@@ -577,41 +539,39 @@
         }
         
         .form-group label {
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             font-weight: 500;
             color: var(--dark);
-            font-size: 0.9rem;
         }
         
         .form-group input,
         .form-group select,
         .form-group textarea {
-            padding: 10px;
+            padding: 12px;
             border: 1px solid var(--light-gray);
             border-radius: 8px;
-            font-size: 0.9rem;
+            font-size: 1rem;
         }
         
         .form-group textarea {
-            min-height: 80px;
+            min-height: 100px;
             resize: vertical;
         }
         
         .form-actions {
             display: flex;
             justify-content: flex-end;
-            gap: 8px;
-            margin-top: 15px;
+            gap: 10px;
+            margin-top: 20px;
         }
         
         .btn {
-            padding: 8px 16px;
+            padding: 10px 20px;
             border-radius: 8px;
             border: none;
             cursor: pointer;
             font-weight: 500;
             transition: all 0.3s;
-            font-size: 0.9rem;
         }
         
         .btn-primary {
@@ -633,9 +593,9 @@
         }
         
         .maintenance-status {
-            padding: 4px 8px;
+            padding: 4px 10px;
             border-radius: 20px;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-weight: 500;
             display: inline-block;
         }
@@ -658,23 +618,22 @@
         /* Geofence Alert Styles */
         .geofence-alert {
             position: fixed;
-            top: 15px;
-            right: 15px;
-            left: 15px;
+            top: 20px;
+            right: 20px;
             background-color: var(--danger);
             color: white;
-            padding: 12px 20px;
+            padding: 15px 25px;
             border-radius: 8px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             z-index: 2000;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             animation: slideIn 0.5s ease-out;
         }
         
         .geofence-alert i {
-            font-size: 1.3rem;
+            font-size: 1.5rem;
         }
         
         .geofence-alert-content {
@@ -683,8 +642,7 @@
         
         .geofence-alert-title {
             font-weight: 600;
-            margin-bottom: 3px;
-            font-size: 0.95rem;
+            margin-bottom: 5px;
         }
         
         .geofence-alert-close {
@@ -692,7 +650,7 @@
             border: none;
             color: white;
             cursor: pointer;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             padding: 0 5px;
         }
         
@@ -704,17 +662,16 @@
         /* Geofence Configuration Panel */
         .geofence-panel {
             position: absolute;
-            top: 60px;
-            left: 15px;
-            right: 15px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 12px;
-            border-radius: 8px;
+            top: 70px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.92);
+            padding: 16px;
+            border-radius: 10px;
             z-index: 1000;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             border: 1px solid var(--light-gray);
-            width: calc(100% - 30px);
-            max-height: 80%;
+            width: 300px;
+            max-height: 90%;
             overflow-y: auto;
             display: none;
         }
@@ -727,15 +684,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
             border-bottom: 1px solid var(--light-gray);
         }
         
         .geofence-header h3 {
             color: var(--primary);
             font-weight: 600;
-            font-size: 1.1rem;
         }
         
         .geofence-close {
@@ -743,57 +699,53 @@
             border: none;
             color: var(--gray);
             cursor: pointer;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
         }
         
         .geofence-form-group {
-            margin-bottom: 12px;
+            margin-bottom: 15px;
         }
         
         .geofence-form-group label {
             display: block;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
             font-weight: 500;
-            font-size: 0.9rem;
         }
         
         .geofence-form-group input {
             width: 100%;
-            padding: 8px;
+            padding: 10px;
             border: 1px solid var(--light-gray);
             border-radius: 8px;
-            font-size: 0.9rem;
+            font-size: 1rem;
         }
         
         .radius-slider {
             width: 100%;
-            margin: 12px 0;
+            margin: 15px 0;
         }
         
         .radius-value {
             text-align: center;
             font-weight: 500;
-            margin-top: 4px;
+            margin-top: 5px;
             color: var(--primary);
-            font-size: 0.9rem;
         }
         
         .geofence-actions {
             display: flex;
-            gap: 8px;
-            margin-top: 12px;
+            gap: 10px;
+            margin-top: 15px;
         }
         
         .geofence-actions .btn {
             flex: 1;
-            padding: 8px;
-            font-size: 0.9rem;
         }
         
         .geofence-center-marker {
             position: absolute;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             background-color: transparent;
             border: 3px solid var(--geofence);
@@ -807,8 +759,8 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 7px;
-            height: 7px;
+            width: 8px;
+            height: 8px;
             background-color: var(--geofence);
             border-radius: 50%;
             transform: translate(-50%, -50%);
@@ -819,60 +771,57 @@
             background: white;
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            padding: 15px;
-            margin-bottom: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
         }
         
         .calendar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
         }
         
         .calendar-nav {
             display: flex;
-            gap: 8px;
+            gap: 10px;
         }
         
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 3px;
+            gap: 5px;
         }
         
         .calendar-day-header {
             text-align: center;
             font-weight: bold;
-            padding: 6px 0;
+            padding: 8px 0;
             background-color: var(--light);
             border-radius: 4px;
-            font-size: 0.85rem;
         }
         
         .calendar-day {
-            min-height: 70px;
+            min-height: 80px;
             border: 1px solid var(--light-gray);
             border-radius: 6px;
-            padding: 5px;
+            padding: 8px;
             position: relative;
             background-color: white;
-            font-size: 0.9rem;
         }
         
         .calendar-date {
             font-weight: bold;
-            margin-bottom: 3px;
+            margin-bottom: 5px;
             color: var(--dark);
-            font-size: 0.9rem;
         }
         
         /* Color-coded calendar events */
         .calendar-event {
-            padding: 3px 6px;
+            padding: 4px 8px;
             border-radius: 4px;
-            font-size: 0.75rem;
-            margin-bottom: 2px;
+            font-size: 0.8rem;
+            margin-bottom: 3px;
             cursor: pointer;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -900,14 +849,14 @@
         
         .edit-buttons {
             display: flex;
-            gap: 4px;
+            gap: 5px;
             justify-content: flex-end;
-            margin-top: 8px;
+            margin-top: 10px;
         }
         
         .edit-btn {
-            padding: 3px 6px;
-            font-size: 0.75rem;
+            padding: 4px 8px;
+            font-size: 0.8rem;
             border-radius: 4px;
             border: none;
             cursor: pointer;
@@ -927,8 +876,8 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             background-color: var(--secondary);
             border: 2px solid white;
             border-radius: 50%;
@@ -966,29 +915,151 @@
         .radar-distance-label {
             position: absolute;
             background: rgba(255,255,255,0.8);
-            padding: 2px 5px;
+            padding: 2px 6px;
             border-radius: 4px;
-            font-size: 0.65rem;
+            font-size: 0.7rem;
         }
         
-        /* Mobile tabs dropdown */
+        /* Responsive styles */
+        @media (max-width: 1200px) {
+            .tab-body {
+                grid-template-columns: 1fr;
+            }
+            
+            .map-container, .data-table-container {
+                height: 400px;
+            }
+            
+            .maintenance-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .status-bar {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .nav-tabs {
+                margin-top: 15px;
+                overflow-x: auto;
+                width: 100%;
+                padding-bottom: 5px;
+            }
+            
+            .map-container, .data-table-container {
+                height: 350px;
+            }
+            
+            .tab-body {
+                padding: 15px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .geofence-alert {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                width: calc(100% - 20px);
+            }
+            
+            .geofence-panel {
+                width: calc(100% - 40px);
+                top: 60px;
+                left: 20px;
+                right: 20px;
+            }
+
+            /* Mobile form adjustments */
+            .add-log-form {
+                padding: 15px;
+            }
+            
+            .form-group input, 
+            .form-group select, 
+            .form-group textarea {
+                padding: 10px;
+            }
+            
+            .btn {
+                padding: 8px 16px;
+            }
+            
+            .calendar-grid {
+                grid-template-columns: repeat(7, 1fr);
+                gap: 3px;
+            }
+            
+            .calendar-day {
+                min-height: 60px;
+                padding: 4px;
+            }
+            
+            .calendar-event {
+                font-size: 0.7rem;
+                padding: 2px 4px;
+            }
+        }
+
+        /* Mobile tab dropdown */
         .mobile-tabs {
-            display: block;
+            display: none;
             width: 100%;
-            padding: 8px;
+            padding: 10px;
             border-radius: 8px;
             margin-top: 10px;
             background: rgba(255,255,255,0.15);
             border: none;
             color: white;
-            font-size: 0.9rem;
+            font-size: 1rem;
         }
         
+        @media (max-width: 768px) {
+            .mobile-tabs {
+                display: block;
+            }
+            .nav-tabs {
+                display: none;
+            flex-wrap: wrap;
+            gap: 5px;
+            padding-bottom: 5px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+                -ms-overflow-style: -ms-autohiding-scrollbar;
+            scrollbar-width: none;
+            margin-top: 10px;
+            width: 100%;
+            padding-bottom: 5px;
+            scrollbar-width: none;
+        }
+            
+            .nav-tabs::-webkit-scrollbar {
+                display: none;
+            }
+            
+            .nav-tab {
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-size: 0.9rem;
+                white-space: nowrap;
+            }
+        }
+
         /* Loading spinner */
         .spinner {
             border: 4px solid rgba(0, 0, 0, 0.1);
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             border-left-color: var(--primary);
             animation: spin 1s linear infinite;
@@ -999,92 +1070,6 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
-        }
-        
-        /* Scrollable tabs */
-        .tab-sections-container {
-            display: flex;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            gap: 15px;
-            padding: 0 15px 10px;
-        }
-        
-        .tab-sections-container::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .tab-section {
-            min-width: 95vw;
-            flex: 0 0 auto;
-            scroll-snap-align: start;
-        }
-        
-        /* Mobile optimizations */
-        @media (max-width: 480px) {
-            .header-content {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            
-            .status-bar {
-                width: 100%;
-                justify-content: space-between;
-            }
-            
-            .nav-tabs {
-                margin-top: 10px;
-            }
-            
-            .map-container, .data-table-container {
-                height: 300px;
-            }
-            
-            .tab-header {
-                padding: 10px 12px;
-                font-size: 1rem;
-            }
-            
-            .calendar-day {
-                min-height: 60px;
-            }
-            
-            .form-title {
-                font-size: 1rem;
-            }
-            
-            .btn {
-                padding: 7px 14px;
-            }
-            
-            footer {
-                padding: 10px;
-                font-size: 0.8rem;
-            }
-        }
-        
-        @media (min-width: 768px) {
-            .tab-body {
-                grid-template-columns: 1fr 1fr;
-                overflow-x: visible;
-            }
-            
-            .tab-section {
-                min-width: auto;
-            }
-            
-            .tab-sections-container {
-                display: block;
-                overflow-x: visible;
-                padding: 0;
-            }
-            
-            .maintenance-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
         }
     </style>
 </head>
@@ -1103,7 +1088,7 @@
                     </div>
                     <div class="device-count">
                         <i class="fas fa-microchip"></i>
-                        Active: <strong id="active-devices">0</strong>
+                        Active devices: <strong id="active-devices">0</strong>
                     </div>
                 </div>
             </div>
@@ -1130,98 +1115,92 @@
                 <i class="fas fa-globe-americas"></i> Outdoor Device Tracking
             </div>
             <div class="tab-body">
-                <div class="tab-sections-container">
-                    <div class="tab-section">
-                        <div class="map-container">
-                            <div class="header">
-                                <span>World Map</span>
-                                <div>
-                                    <button class="btn btn-secondary" id="set-geofence-btn">
-                                        <i class="fas fa-draw-polygon"></i> Geofence
-                                    </button>
-                                    <button class="refresh-btn" id="refresh-outdoor">
-                                        <i class="fas fa-sync"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div id="outdoor-map"></div>
-                            <div class="map-legend">
-                                <div class="legend-title">Map Legend</div>
-                                <div class="legend-item">
-                                    <div class="legend-color" style="background-color: var(--primary);"></div>
-                                    <span>Device Location</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-color" style="background-color: var(--geofence);"></div>
-                                    <span>Geofence Area</span>
-                                </div>
-                            </div>
-                            
-                            <!-- Geofence configuration panel -->
-                            <div class="geofence-panel" id="geofence-panel">
-                                <div class="geofence-header">
-                                    <h3><i class="fas fa-fence"></i> Geofence Configuration</h3>
-                                    <button class="geofence-close" id="close-geofence-panel">&times;</button>
-                                </div>
-                                
-                                <div class="geofence-form-group">
-                                    <label for="geofence-lat">Latitude</label>
-                                    <input type="number" id="geofence-lat" step="0.000001" placeholder="Enter latitude">
-                                </div>
-                                
-                                <div class="geofence-form-group">
-                                    <label for="geofence-lng">Longitude</label>
-                                    <input type="number" id="geofence-lng" step="0.000001" placeholder="Enter longitude">
-                                </div>
-                                
-                                <div class="geofence-form-group">
-                                    <label for="geofence-radius">Radius: <span id="radius-value">500</span> meters</label>
-                                    <input type="range" id="geofence-radius" class="radius-slider" min="50" max="2000" value="500" step="50">
-                                </div>
-                                
-                                <p class="help-text"><i class="fas fa-info-circle"></i> Click on the map to set center location</p>
-                                
-                                <div class="geofence-actions">
-                                    <button class="btn btn-secondary" id="remove-geofence">
-                                        <i class="fas fa-trash"></i> Remove
-                                    </button>
-                                    <button class="btn btn-primary" id="save-geofence">
-                                        <i class="fas fa-save"></i> Save
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <!-- Center marker for geofence setup -->
-                            <div class="geofence-center-marker" id="geofence-center-marker"></div>
+                <div class="map-container">
+                    <div class="header">
+                        <span>World Map with Device Locations</span>
+                        <div>
+                            <button class="btn btn-secondary" id="set-geofence-btn">
+                                <i class="fas fa-draw-polygon"></i> Configure Geofence
+                            </button>
+                            <button class="refresh-btn" id="refresh-outdoor">
+                                <i class="fas fa-sync"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    <div id="outdoor-map"></div>
+                    <div class="map-legend">
+                        <div class="legend-title">Map Legend</div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: var(--primary);"></div>
+                            <span>Device Location</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: var(--geofence);"></div>
+                            <span>Geofence Area</span>
                         </div>
                     </div>
                     
-                    <div class="tab-section">
-                        <div class="data-table-container">
-                            <div class="header">
-                                <span>Device Data</span>
-                                <button class="refresh-btn" id="refresh-outdoor-table">
-                                    <i class="fas fa-sync"></i>
-                                </button>
-                            </div>
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Device ID</th>
-                                        <th>Time</th>
-                                        <th>Latitude</th>
-                                        <th>Longitude</th>
-                                        <th>Accuracy</th>
-                                        <th>Status</th>
-                                        <th>Geofence</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="outdoor-table-body">
-                                    <!-- Data will be populated here -->
-                                </tbody>
-                            </table>
+                    <!-- Geofence configuration panel -->
+                    <div class="geofence-panel" id="geofence-panel">
+                        <div class="geofence-header">
+                            <h3><i class="fas fa-fence"></i> Geofence Configuration</h3>
+                            <button class="geofence-close" id="close-geofence-panel">&times;</button>
+                        </div>
+                        
+                        <div class="geofence-form-group">
+                            <label for="geofence-lat">Latitude</label>
+                            <input type="number" id="geofence-lat" step="0.000001" placeholder="Enter latitude">
+                        </div>
+                        
+                        <div class="geofence-form-group">
+                            <label for="geofence-lng">Longitude</label>
+                            <input type="number" id="geofence-lng" step="0.000001" placeholder="Enter longitude">
+                        </div>
+                        
+                        <div class="geofence-form-group">
+                            <label for="geofence-radius">Radius: <span id="radius-value">500</span> meters</label>
+                            <input type="range" id="geofence-radius" class="radius-slider" min="50" max="2000" value="500" step="50">
+                        </div>
+                        
+                        <p class="help-text"><i class="fas fa-info-circle"></i> Click on the map to set center location</p>
+                        
+                        <div class="geofence-actions">
+                            <button class="btn btn-secondary" id="remove-geofence">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                            <button class="btn btn-primary" id="save-geofence">
+                                <i class="fas fa-save"></i> Save
+                            </button>
                         </div>
                     </div>
+                    
+                    <!-- Center marker for geofence setup -->
+                    <div class="geofence-center-marker" id="geofence-center-marker"></div>
+                </div>
+                
+                <div class="data-table-container">
+                    <div class="header">
+                        <span>Outdoor Device Data from ESP32 & GPS Module</span>
+                        <button class="refresh-btn" id="refresh-outdoor-table">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Device ID</th>
+                                <th>Timestamp</th>
+                                <th>Latitude</th>
+                                <th>Longitude</th>
+                                <th>Accuracy</th>
+                                <th>Status</th>
+                                <th>Geofence</th>
+                            </tr>
+                        </thead>
+                        <tbody id="outdoor-table-body">
+                            <!-- Data will be populated here -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -1232,64 +1211,58 @@
                 <i class="fas fa-hospital"></i> Indoor Device Tracking
             </div>
             <div class="tab-body">
-                <div class="tab-sections-container">
-                    <div class="tab-section">
-                        <div class="map-container">
-                            <div class="header">
-                                <span>Radar View</span>
-                                <button class="refresh-btn" id="refresh-indoor">
-                                    <i class="fas fa-sync"></i>
-                                </button>
-                            </div>
-                            <div id="indoor-map">
-                                <div class="radar-grid" id="radar-grid">
-                                    <!-- Central anchor will be added here -->
-                                    <!-- Distance rings will be added here -->
-                                    <!-- Tags will be positioned here -->
-                                </div>
-                            </div>
-                            <div class="map-legend">
-                                <div class="legend-title">Radar Legend</div>
-                                <div class="legend-item">
-                                    <div class="legend-color" style="background-color: var(--secondary);"></div>
-                                    <span>Central Anchor</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-color" style="background-color: var(--primary);"></div>
-                                    <span>Device Tag</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-color" style="background-color: rgba(0,0,0,0.1);"></div>
-                                    <span>Distance Ring</span>
-                                </div>
-                            </div>
+                <div class="map-container">
+                    <div class="header">
+                        <span>Radar View with Central Anchor</span>
+                        <button class="refresh-btn" id="refresh-indoor">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                    <div id="indoor-map">
+                        <div class="radar-grid" id="radar-grid">
+                            <!-- Central anchor will be added here -->
+                            <!-- Distance rings will be added here -->
+                            <!-- Tags will be positioned here -->
                         </div>
                     </div>
-                    
-                    <div class="tab-section">
-                        <div class="data-table-container">
-                            <div class="header">
-                                <span>Device Data</span>
-                                <button class="refresh-btn" id="refresh-indoor-table">
-                                    <i class="fas fa-sync"></i>
-                                </button>
-                            </div>
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Tag ID</th>
-                                        <th>Time</th>
-                                        <th>Distance</th>
-                                        <th>Angle</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="indoor-table-body">
-                                    <!-- Data will be populated here -->
-                                </tbody>
-                            </table>
+                    <div class="map-legend">
+                        <div class="legend-title">Radar Legend</div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: var(--secondary);"></div>
+                            <span>Central Anchor</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: var(--primary);"></div>
+                            <span>Device Tag</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: rgba(0,0,0,0.1);"></div>
+                            <span>Distance Ring</span>
                         </div>
                     </div>
+                </div>
+                
+                <div class="data-table-container">
+                    <div class="header">
+                        <span>Indoor Device Data from ESP32 Anchors</span>
+                        <button class="refresh-btn" id="refresh-indoor-table">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Tag ID</th>
+                                <th>Timestamp</th>
+                                <th>Distance</th>
+                                <th>Angle</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="indoor-table-body">
+                            <!-- Data will be populated here -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -1300,136 +1273,128 @@
                 <i class="fas fa-tools"></i> Maintenance Dashboard
             </div>
             <div class="tab-body">
-                <div class="tab-sections-container">
-                    <div class="tab-section">
-                        <div class="calendar-container">
-                            <div class="calendar-header">
-                                <h2><i class="fas fa-calendar-alt"></i> Maintenance Calendar</h2>
-                                <div class="calendar-nav">
-                                    <button class="btn btn-secondary" id="prev-month"><i class="fas fa-chevron-left"></i></button>
-                                    <h3 id="current-month-year">July 2025</h3>
-                                    <button class="btn btn-secondary" id="next-month"><i class="fas fa-chevron-right"></i></button>
-                                </div>
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <h2><i class="fas fa-calendar-alt"></i> Maintenance Calendar</h2>
+                        <div class="calendar-nav">
+                            <button class="btn btn-secondary" id="prev-month"><i class="fas fa-chevron-left"></i></button>
+                            <h3 id="current-month-year">July 2025</h3>
+                            <button class="btn btn-secondary" id="next-month"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                    <div class="calendar-grid" id="calendar-grid">
+                        <!-- Calendar will be generated here -->
+                    </div>
+                </div>
+                
+                <div class="add-log-form">
+                    <h2 class="form-title"><i class="fas fa-plus-circle"></i> <span id="form-title-text">Add New Maintenance Log</span></h2>
+                    <form id="maintenance-form">
+                        <input type="hidden" id="log-key">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="device-id">Device ID</label>
+                                <input type="text" id="device-id" required>
                             </div>
-                            <div class="calendar-grid" id="calendar-grid">
-                                <!-- Calendar will be generated here -->
+                            <div class="form-group">
+                                <label for="maintenance-type">Maintenance Type</label>
+                                <select id="maintenance-type" required>
+                                    <option value="">Select Type</option>
+                                    <option value="upcoming">Upcoming</option>
+                                    <option value="ongoing">Ongoing</option>
+                                    <option value="complete">Complete</option>
+                                </select>
                             </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="scheduled-date">Scheduled Date</label>
+                                <input type="date" id="scheduled-date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="assigned-technician">Assigned Technician</label>
+                                <input type="text" id="assigned-technician" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea id="description" required></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="reset" class="btn btn-secondary" id="cancel-edit" style="display:none;">Cancel</button>
+                            <button type="reset" class="btn btn-secondary">Clear</button>
+                            <button type="submit" class="btn btn-primary" id="submit-log">Add Log</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="maintenance-grid">
+                    <div class="maintenance-card complete">
+                        <div class="header">
+                            <span>Complete Maintenance</span>
+                            <div class="count" id="complete-count">0</div>
+                        </div>
+                        <div class="content">
+                            <table class="maintenance-table" id="complete-table">
+                                <thead>
+                                    <tr>
+                                        <th>Device ID</th>
+                                        <th>Completed</th>
+                                        <th>Technician</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Complete logs will be populated here -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                     
-                    <div class="tab-section">
-                        <div class="add-log-form">
-                            <h2 class="form-title"><i class="fas fa-plus-circle"></i> <span id="form-title-text">Add New Maintenance Log</span></h2>
-                            <form id="maintenance-form">
-                                <input type="hidden" id="log-key">
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="device-id">Device ID</label>
-                                        <input type="text" id="device-id" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="maintenance-type">Maintenance Type</label>
-                                        <select id="maintenance-type" required>
-                                            <option value="">Select Type</option>
-                                            <option value="upcoming">Upcoming</option>
-                                            <option value="ongoing">Ongoing</option>
-                                            <option value="complete">Complete</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="scheduled-date">Scheduled Date</label>
-                                        <input type="date" id="scheduled-date" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="assigned-technician">Assigned Technician</label>
-                                        <input type="text" id="assigned-technician" required>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="description">Description</label>
-                                    <textarea id="description" required></textarea>
-                                </div>
-                                <div class="form-actions">
-                                    <button type="reset" class="btn btn-secondary" id="cancel-edit" style="display:none;">Cancel</button>
-                                    <button type="reset" class="btn btn-secondary">Clear</button>
-                                    <button type="submit" class="btn btn-primary" id="submit-log">Add Log</button>
-                                </div>
-                            </form>
+                    <div class="maintenance-card ongoing">
+                        <div class="header">
+                            <span>Ongoing Maintenance</span>
+                            <div class="count" id="ongoing-count">0</div>
+                        </div>
+                        <div class="content">
+                            <table class="maintenance-table" id="ongoing-table">
+                                <thead>
+                                    <tr>
+                                        <th>Device ID</th>
+                                        <th>Started</th>
+                                        <th>Technician</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Ongoing logs will be populated here -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                     
-                    <div class="tab-section">
-                        <div class="maintenance-grid">
-                            <div class="maintenance-card complete">
-                                <div class="header">
-                                    <span>Complete Maintenance</span>
-                                    <div class="count" id="complete-count">0</div>
-                                </div>
-                                <div class="content">
-                                    <table class="maintenance-table" id="complete-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Device ID</th>
-                                                <th>Completed</th>
-                                                <th>Technician</th>
-                                                <th>Status</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <!-- Complete logs will be populated here -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            
-                            <div class="maintenance-card ongoing">
-                                <div class="header">
-                                    <span>Ongoing Maintenance</span>
-                                    <div class="count" id="ongoing-count">0</div>
-                                </div>
-                                <div class="content">
-                                    <table class="maintenance-table" id="ongoing-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Device ID</th>
-                                                <th>Started</th>
-                                                <th>Technician</th>
-                                                <th>Status</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <!-- Ongoing logs will be populated here -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            
-                            <div class="maintenance-card upcoming">
-                                <div class="header">
-                                    <span>Upcoming Maintenance</span>
-                                    <div class="count" id="upcoming-count">0</div>
-                                </div>
-                                <div class="content">
-                                    <table class="maintenance-table" id="upcoming-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Device ID</th>
-                                                <th>Scheduled</th>
-                                                <th>Technician</th>
-                                                <th>Status</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <!-- Upcoming logs will be populated here -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                    <div class="maintenance-card upcoming">
+                        <div class="header">
+                            <span>Upcoming Maintenance</span>
+                            <div class="count" id="upcoming-count">0</div>
+                        </div>
+                        <div class="content">
+                            <table class="maintenance-table" id="upcoming-table">
+                                <thead>
+                                    <tr>
+                                        <th>Device ID</th>
+                                        <th>Scheduled</th>
+                                        <th>Technician</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Upcoming logs will be populated here -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -1713,7 +1678,7 @@
                 tbody.appendChild(row);
             }
             
-            const timestamp = new Date(device.timestamp).toLocaleTimeString();
+            const timestamp = new Date(device.timestamp).toLocaleString();
             const isInside = isInsideGeofence(device.lat, device.lng);
             
             row.innerHTML = `
@@ -1738,7 +1703,7 @@
                 tbody.appendChild(row);
             }
             
-            const timestamp = new Date(device.timestamp).toLocaleTimeString();
+            const timestamp = new Date(device.timestamp).toLocaleString();
             
             row.innerHTML = `
                 <td><span class="status-indicator ${device.status === "alert" ? "alert" : ""}"></span> ${device.id}</td>
@@ -2269,24 +2234,6 @@
             
             // Initialize calendar with current date
             currentDate = new Date();
-            
-            // Add touch scroll support
-            document.querySelectorAll('.tab-sections-container').forEach(container => {
-                let startX;
-                let scrollLeft;
-                
-                container.addEventListener('touchstart', (e) => {
-                    startX = e.touches[0].pageX - container.offsetLeft;
-                    scrollLeft = container.scrollLeft;
-                });
-                
-                container.addEventListener('touchmove', (e) => {
-                    if (!startX) return;
-                    const x = e.touches[0].pageX - container.offsetLeft;
-                    const walk = (x - startX) * 2;
-                    container.scrollLeft = scrollLeft - walk;
-                });
-            });
         });
     </script>
 </body>

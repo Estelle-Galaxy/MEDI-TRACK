@@ -766,6 +766,146 @@
             transform: translate(-50%, -50%);
         }
         
+        /* Calendar styles */
+        .calendar-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        
+        .calendar-day-header {
+            text-align: center;
+            font-weight: bold;
+            padding: 8px 0;
+            background-color: var(--light);
+            border-radius: 4px;
+        }
+        
+        .calendar-day {
+            min-height: 80px;
+            border: 1px solid var(--light-gray);
+            border-radius: 6px;
+            padding: 8px;
+            position: relative;
+            background-color: white;
+        }
+        
+        .calendar-date {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+        
+        .calendar-event {
+            background-color: var(--primary);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-bottom: 3px;
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .calendar-event:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .edit-buttons {
+            display: flex;
+            gap: 5px;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+        
+        .edit-btn {
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+        }
+        
+        /* Radar specific styles */
+        .radar-grid {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-color: #e3f2fd;
+            border: 2px solid var(--primary);
+            overflow: hidden;
+        }
+        
+        .radar-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            background-color: var(--secondary);
+            border: 2px solid white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+        
+        .radar-sweep {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            transform-origin: top left;
+            background: linear-gradient(90deg, transparent, rgba(166, 200, 224, 0.2));
+            animation: radarSweep 4s infinite linear;
+            border-radius: 50%;
+            clip-path: polygon(50% 50%, 100% 0, 100% 100%, 0 100%, 0 0);
+        }
+        
+        @keyframes radarSweep {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .radar-distance-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border: 1px dashed rgba(0,0,0,0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .radar-distance-label {
+            position: absolute;
+            background: rgba(255,255,255,0.8);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+        }
+        
         /* Responsive styles */
         @media (max-width: 1200px) {
             .tab-body {
@@ -840,6 +980,21 @@
             .btn {
                 padding: 8px 16px;
             }
+            
+            .calendar-grid {
+                grid-template-columns: repeat(7, 1fr);
+                gap: 3px;
+            }
+            
+            .calendar-day {
+                min-height: 60px;
+                padding: 4px;
+            }
+            
+            .calendar-event {
+                font-size: 0.7rem;
+                padding: 2px 4px;
+            }
         }
 
         /* Mobile tab dropdown */
@@ -861,6 +1016,28 @@
             }
             .nav-tabs {
                 display: none;
+            flex-wrap: wrap;
+            gap: 5px;
+            padding-bottom: 5px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+                -ms-overflow-style: -ms-autohiding-scrollbar;
+            scrollbar-width: none;
+            margin-top: 10px;
+            width: 100%;
+            padding-bottom: 5px;
+            scrollbar-width: none;
+        }
+            
+            .nav-tabs::-webkit-scrollbar {
+                display: none;
+            }
+            
+            .nav-tab {
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-size: 0.9rem;
+                white-space: nowrap;
             }
         }
 
@@ -1022,30 +1199,31 @@
             <div class="tab-body">
                 <div class="map-container">
                     <div class="header">
-                        <span>Hospital Layout with Anchors & Tags</span>
+                        <span>Radar View with Central Anchor</span>
                         <button class="refresh-btn" id="refresh-indoor">
                             <i class="fas fa-sync"></i> Refresh
                         </button>
                     </div>
                     <div id="indoor-map">
-                        <div class="indoor-grid">
-                            <!-- Grid lines will be added dynamically -->
-                            <!-- Anchors and tags will be positioned here -->
+                        <div class="radar-grid" id="radar-grid">
+                            <!-- Central anchor will be added here -->
+                            <!-- Distance rings will be added here -->
+                            <!-- Tags will be positioned here -->
                         </div>
                     </div>
                     <div class="map-legend">
-                        <div class="legend-title">Indoor Legend</div>
+                        <div class="legend-title">Radar Legend</div>
                         <div class="legend-item">
                             <div class="legend-color" style="background-color: var(--secondary);"></div>
-                            <span>Anchor Position</span>
+                            <span>Central Anchor</span>
                         </div>
                         <div class="legend-item">
                             <div class="legend-color" style="background-color: var(--primary);"></div>
                             <span>Device Tag</span>
                         </div>
                         <div class="legend-item">
-                            <div class="legend-color" style="background-color: var(--danger);"></div>
-                            <span>Distance Line</span>
+                            <div class="legend-color" style="background-color: rgba(0,0,0,0.1);"></div>
+                            <span>Distance Ring</span>
                         </div>
                     </div>
                 </div>
@@ -1062,9 +1240,8 @@
                             <tr>
                                 <th>Tag ID</th>
                                 <th>Timestamp</th>
-                                <th>Anchor ID</th>
-                                <th>Room</th>
                                 <th>Distance</th>
+                                <th>Angle</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -1082,9 +1259,24 @@
                 <i class="fas fa-tools"></i> Maintenance Dashboard
             </div>
             <div class="tab-body">
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <h2><i class="fas fa-calendar-alt"></i> Maintenance Calendar</h2>
+                        <div class="calendar-nav">
+                            <button class="btn btn-secondary" id="prev-month"><i class="fas fa-chevron-left"></i></button>
+                            <h3 id="current-month-year">July 2025</h3>
+                            <button class="btn btn-secondary" id="next-month"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                    <div class="calendar-grid" id="calendar-grid">
+                        <!-- Calendar will be generated here -->
+                    </div>
+                </div>
+                
                 <div class="add-log-form">
-                    <h2 class="form-title"><i class="fas fa-plus-circle"></i> Add New Maintenance Log</h2>
+                    <h2 class="form-title"><i class="fas fa-plus-circle"></i> <span id="form-title-text">Add New Maintenance Log</span></h2>
                     <form id="maintenance-form">
+                        <input type="hidden" id="log-key">
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="device-id">Device ID</label>
@@ -1115,8 +1307,9 @@
                             <textarea id="description" required></textarea>
                         </div>
                         <div class="form-actions">
+                            <button type="reset" class="btn btn-secondary" id="cancel-edit" style="display:none;">Cancel</button>
                             <button type="reset" class="btn btn-secondary">Clear</button>
-                            <button type="submit" class="btn btn-primary">Add Log</button>
+                            <button type="submit" class="btn btn-primary" id="submit-log">Add Log</button>
                         </div>
                     </form>
                 </div>
@@ -1135,6 +1328,7 @@
                                         <th>Completed</th>
                                         <th>Technician</th>
                                         <th>Status</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1157,6 +1351,7 @@
                                         <th>Started</th>
                                         <th>Technician</th>
                                         <th>Status</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1179,6 +1374,7 @@
                                         <th>Scheduled</th>
                                         <th>Technician</th>
                                         <th>Status</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1253,55 +1449,45 @@
         let outdoorDevicesData = {};
         let indoorDevicesData = {};
         
-        // Anchor configuration for indoor map
-        const anchorsConfig = [
-            {id: "ANC-A1", top: "50%", left: "50%"},
-        ];
+        // Radar configuration
+        const radarMaxDistance = 10; // Max distance in meters for radar visualization
+        let tagAngles = {}; // Store angles for tags
         
-        // Initialize indoor map
-        function initializeIndoorMap() {
-            const indoorMap = document.querySelector('.indoor-grid');
+        // Initialize radar view
+        function initializeRadarView() {
+            const radarGrid = document.getElementById('radar-grid');
             
-            // Clear existing grid elements
-            indoorMap.innerHTML = '';
+            // Clear existing elements
+            radarGrid.innerHTML = '';
             
-            // Create grid lines
-            for (let i = 1; i < 10; i++) {
-                // Vertical lines
-                const vLine = document.createElement('div');
-                vLine.className = 'grid-line vertical';
-                vLine.style.left = `${i * 10}%`;
-                indoorMap.appendChild(vLine);
+            // Add central anchor
+            const anchor = document.createElement('div');
+            anchor.className = 'radar-center';
+            anchor.textContent = 'C';
+            radarGrid.appendChild(anchor);
+            
+            // Add radar sweep animation
+            const sweep = document.createElement('div');
+            sweep.className = 'radar-sweep';
+            radarGrid.appendChild(sweep);
+            
+            // Add distance rings
+            const ringDistances = [2, 4, 6, 8]; // meters
+            ringDistances.forEach(distance => {
+                const ring = document.createElement('div');
+                ring.className = 'radar-distance-ring';
+                const radius = (distance / radarMaxDistance) * 50; // Percentage of container
+                ring.style.width = `${radius * 2}%`;
+                ring.style.height = `${radius * 2}%`;
+                radarGrid.appendChild(ring);
                 
-                // Horizontal lines
-                const hLine = document.createElement('div');
-                hLine.className = 'grid-line horizontal';
-                hLine.style.top = `${i * 10}%`;
-                indoorMap.appendChild(hLine);
-            }
-            
-            // Add room labels
-            const rooms = [
-                {name: "Anchor 1", top: "50%", left: "50%"},
-            ];
-            
-            rooms.forEach(room => {
+                // Add distance label
                 const label = document.createElement('div');
-                label.className = 'room-label';
-                label.textContent = room.name;
-                label.style.top = room.top;
-                label.style.left = room.left;
-                indoorMap.appendChild(label);
-            });
-            
-            // Add anchors
-            anchorsConfig.forEach(anchor => {
-                const anchorPoint = document.createElement('div');
-                anchorPoint.className = 'anchor-point';
-                anchorPoint.textContent = anchor.id;
-                anchorPoint.style.top = anchor.top;
-                anchorPoint.style.left = anchor.left;
-                indoorMap.appendChild(anchorPoint);
+                label.className = 'radar-distance-label';
+                label.textContent = `${distance}m`;
+                label.style.left = '50%';
+                label.style.top = `calc(50% - ${radius}% - 15px)`;
+                radarGrid.appendChild(label);
             });
         }
         
@@ -1385,8 +1571,8 @@
             geofenceCenterMarker.style.top = `${point.y}px`;
         }
         
-        // Initialize the indoor map
-        initializeIndoorMap();
+        // Initialize the radar view
+        initializeRadarView();
         
         // Update outdoor map markers
         function updateOutdoorMarker(key, device) {
@@ -1438,48 +1624,33 @@
             }
         }
         
-        // Update indoor tags and lines
+        // Update indoor tags on radar
         function updateIndoorTag(key, device) {
-            const indoorMap = document.querySelector('.indoor-grid');
-            const gridWidth = indoorMap.offsetWidth;
-            const gridHeight = indoorMap.offsetHeight;
+            const radarGrid = document.getElementById('radar-grid');
             
-            // Create device marker
-            const marker = document.createElement('div');
-            marker.className = `device-marker ${device.status === "alert" ? "alert blink" : ""}`;
-            marker.textContent = device.id;
-            marker.style.top = `${device.y}%`;
-            marker.style.left = `${device.x}%`;
-            indoorMap.appendChild(marker);
+            // If this is a new tag, assign a random angle
+            if (!tagAngles[device.id]) {
+                tagAngles[device.id] = Math.random() * 2 * Math.PI; // Random angle in radians
+            }
             
-            // Find connected anchor
-            const anchor = anchorsConfig.find(a => a.id === device.anchorId);
-            if (!anchor) return;
+            // Calculate position based on distance and angle
+            const distance = device.distance || 0;
+            const angle = device.angle || tagAngles[device.id];
+            const scale = Math.min(distance / radarMaxDistance, 1); // Cap at 100% scale
+            const x = 50 + scale * 50 * Math.cos(angle);
+            const y = 50 + scale * 50 * Math.sin(angle);
             
-            // Create distance line
-            const startX = parseInt(anchor.left) / 100 * gridWidth;
-            const startY = parseInt(anchor.top) / 100 * gridHeight;
-            const endX = parseInt(device.x) / 100 * gridWidth;
-            const endY = parseInt(device.y) / 100 * gridHeight;
-            
-            const length = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
-            const angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
-            
-            const line = document.createElement('div');
-            line.className = 'distance-line';
-            line.style.width = `${length}px`;
-            line.style.left = anchor.left;
-            line.style.top = anchor.top;
-            line.style.transform = `rotate(${angle}deg)`;
-            indoorMap.appendChild(line);
-            
-            // Create distance label
-            const label = document.createElement('div');
-            label.className = 'distance-label';
-            label.textContent = `${device.distance}m`;
-            label.style.left = `${(parseInt(anchor.left) + parseInt(device.x)) / 2}%`;
-            label.style.top = `${(parseInt(anchor.top) + parseInt(device.y)) / 2}%`;
-            indoorMap.appendChild(label);
+            // Create or update the tag marker
+            let marker = radarGrid.querySelector(`.device-marker[data-id="${device.id}"]`);
+            if (!marker) {
+                marker = document.createElement('div');
+                marker.className = `device-marker ${device.status === "alert" ? "alert blink" : ""}`;
+                marker.setAttribute('data-id', device.id);
+                marker.textContent = device.id;
+                radarGrid.appendChild(marker);
+            }
+            marker.style.top = `${y}%`;
+            marker.style.left = `${x}%`;
         }
         
         // Add outdoor data to table
@@ -1519,31 +1690,22 @@
             }
             
             const timestamp = new Date(device.timestamp).toLocaleString();
-            const room = getRoomForPosition(device.x, device.y);
             
             row.innerHTML = `
                 <td><span class="status-indicator ${device.status === "alert" ? "alert" : ""}"></span> ${device.id}</td>
                 <td>${timestamp}</td>
-                <td>${device.anchorId}</td>
-                <td>${room}</td>
-                <td>${device.distance}m</td>
+                <td>${device.distance || 0}m</td>
+                <td>${device.angle ? (device.angle * 180 / Math.PI).toFixed(1) + '°' : 'N/A'}</td>
                 <td><span class="status-badge ${device.status === "alert" ? "status-alert" : "status-normal"}">${device.status === "alert" ? "⚠️ Alert" : "✅ Normal"}</span></td>
             `;
         }
         
-        // Helper: Determine room based on position
-        function getRoomForPosition(x, y) {
-            // Example implementation - customize with your actual room coordinates
-            if (x < 50 && y < 50) return "ER Room 1";
-            return "Hallway";
-        }
-        
         // Update UI with device data
         function updateUIWithDevices(outdoorDevices, indoorDevices) {
-            // Clear dynamic indoor elements (device markers, lines, labels)
-            const indoorGrid = document.querySelector('.indoor-grid');
-            if (indoorGrid) {
-                indoorGrid.querySelectorAll('.device-marker, .distance-line, .distance-label').forEach(el => {
+            // Clear dynamic indoor elements (device markers)
+            const radarGrid = document.getElementById('radar-grid');
+            if (radarGrid) {
+                radarGrid.querySelectorAll('.device-marker').forEach(el => {
                     el.remove();
                 });
             }
@@ -1576,6 +1738,8 @@
         }
         
         // Maintenance Dashboard Functions
+        let currentEditKey = null;
+        
         function addMaintenanceLog() {
             const deviceId = document.getElementById('device-id').value;
             const type = document.getElementById('maintenance-type').value;
@@ -1601,19 +1765,69 @@
             // Show loading spinner
             loadingSpinner.style.display = 'block';
             
-            // Save to Firebase
-            const newLogRef = database.ref('/maintenance/logs').push();
-            newLogRef.set(log)
-                .then(() => {
-                    alert("Maintenance log added successfully!");
-                    document.getElementById('maintenance-form').reset();
-                    loadingSpinner.style.display = 'none';
-                })
-                .catch(error => {
-                    console.error("Error adding maintenance log:", error);
-                    alert("Failed to add maintenance log. Please try again.");
-                    loadingSpinner.style.display = 'none';
-                });
+            if (currentEditKey) {
+                // Update existing log
+                database.ref('/maintenance/logs/' + currentEditKey).set(log)
+                    .then(() => {
+                        alert("Maintenance log updated successfully!");
+                        resetForm();
+                        loadingSpinner.style.display = 'none';
+                    })
+                    .catch(error => {
+                        console.error("Error updating maintenance log:", error);
+                        alert("Failed to update maintenance log. Please try again.");
+                        loadingSpinner.style.display = 'none';
+                    });
+            } else {
+                // Create new log
+                const newLogRef = database.ref('/maintenance/logs').push();
+                newLogRef.set(log)
+                    .then(() => {
+                        alert("Maintenance log added successfully!");
+                        document.getElementById('maintenance-form').reset();
+                        loadingSpinner.style.display = 'none';
+                    })
+                    .catch(error => {
+                        console.error("Error adding maintenance log:", error);
+                        alert("Failed to add maintenance log. Please try again.");
+                        loadingSpinner.style.display = 'none';
+                    });
+            }
+        }
+        
+        function resetForm() {
+            document.getElementById('maintenance-form').reset();
+            document.getElementById('log-key').value = '';
+            document.getElementById('form-title-text').textContent = 'Add New Maintenance Log';
+            document.getElementById('submit-log').textContent = 'Add Log';
+            document.getElementById('cancel-edit').style.display = 'none';
+            currentEditKey = null;
+        }
+        
+        function editLog(key, log) {
+            currentEditKey = key;
+            document.getElementById('log-key').value = key;
+            document.getElementById('device-id').value = log.deviceId;
+            document.getElementById('maintenance-type').value = log.type;
+            document.getElementById('scheduled-date').value = log.date;
+            document.getElementById('assigned-technician').value = log.technician;
+            document.getElementById('description').value = log.description;
+            document.getElementById('form-title-text').textContent = 'Edit Maintenance Log';
+            document.getElementById('submit-log').textContent = 'Update Log';
+            document.getElementById('cancel-edit').style.display = 'inline-block';
+        }
+        
+        function deleteLog(key) {
+            if (confirm("Are you sure you want to delete this maintenance log?")) {
+                database.ref('/maintenance/logs/' + key).remove()
+                    .then(() => {
+                        alert("Maintenance log deleted successfully!");
+                    })
+                    .catch(error => {
+                        console.error("Error deleting maintenance log:", error);
+                        alert("Failed to delete maintenance log. Please try again.");
+                    });
+            }
         }
         
         function updateMaintenanceDashboard(logs) {
@@ -1622,7 +1836,8 @@
             const upcomingLogs = [];
             
             // Organize logs by type
-            Object.values(logs).forEach(log => {
+            Object.entries(logs).forEach(([key, log]) => {
+                log.key = key;
                 if (log.type === 'complete') {
                     completeLogs.push(log);
                 } else if (log.type === 'ongoing') {
@@ -1641,6 +1856,9 @@
             updateMaintenanceTable('complete-table', completeLogs);
             updateMaintenanceTable('ongoing-table', ongoingLogs);
             updateMaintenanceTable('upcoming-table', upcomingLogs);
+            
+            // Update calendar
+            updateCalendar(logs);
         }
         
         function updateMaintenanceTable(tableId, logs) {
@@ -1676,24 +1894,105 @@
                     <td>${dateField}</td>
                     <td>${log.technician}</td>
                     <td>${statusBadge}</td>
+                    <td class="edit-buttons">
+                        <button class="edit-btn btn-primary" data-key="${log.key}"><i class="fas fa-edit"></i></button>
+                        <button class="edit-btn btn-secondary" data-key="${log.key}"><i class="fas fa-trash"></i></button>
+                    </td>
                 `;
                 
-                // Add click event to show details
-                row.addEventListener('click', () => {
-                    showMaintenanceDetails(log);
+                // Add edit event
+                row.querySelector('.btn-primary').addEventListener('click', () => {
+                    editLog(log.key, log);
+                });
+                
+                // Add delete event
+                row.querySelector('.btn-secondary').addEventListener('click', () => {
+                    deleteLog(log.key);
                 });
                 
                 tbody.appendChild(row);
             });
         }
         
-        function showMaintenanceDetails(log) {
-            alert(`Maintenance Details:
-Device ID: ${log.deviceId}
-Type: ${log.type.charAt(0).toUpperCase() + log.type.slice(1)}
-Date: ${log.date}
-Technician: ${log.technician}
-Description: ${log.description}`);
+        // Calendar functions
+        let currentDate = new Date();
+        
+        function updateCalendar(logs) {
+            const calendarGrid = document.getElementById('calendar-grid');
+            calendarGrid.innerHTML = '';
+            
+            // Update month/year header
+            document.getElementById('current-month-year').textContent = 
+                currentDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+            
+            // Create day headers
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            days.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'calendar-day-header';
+                header.textContent = day;
+                calendarGrid.appendChild(header);
+            });
+            
+            // Get first day of month
+            const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+            // Get last day of month
+            const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+            
+            // Calculate starting day (0 = Sunday, 1 = Monday, etc.)
+            let startDay = firstDay.getDay();
+            
+            // Add empty cells for days before the first day
+            for (let i = 0; i < startDay; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'calendar-day';
+                calendarGrid.appendChild(emptyCell);
+            }
+            
+            // Add cells for each day of the month
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const dayCell = document.createElement('div');
+                dayCell.className = 'calendar-day';
+                
+                // Format date as YYYY-MM-DD
+                const dateStr = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+                
+                dayCell.innerHTML = `<div class="calendar-date">${day}</div>`;
+                
+                // Add events for this day
+                Object.entries(logs).forEach(([key, log]) => {
+                    if (log.date === dateStr) {
+                        const event = document.createElement('div');
+                        event.className = 'calendar-event';
+                        event.textContent = `${log.deviceId}: ${log.description.substring(0, 15)}${log.description.length > 15 ? '...' : ''}`;
+                        event.title = `${log.deviceId} - ${log.description}`;
+                        event.addEventListener('click', () => {
+                            editLog(key, log);
+                        });
+                        dayCell.appendChild(event);
+                    }
+                });
+                
+                calendarGrid.appendChild(dayCell);
+            }
+        }
+        
+        function prevMonth() {
+            currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
+            database.ref('/maintenance/logs').once('value')
+                .then(snapshot => {
+                    const logs = snapshot.val() || {};
+                    updateCalendar(logs);
+                });
+        }
+        
+        function nextMonth() {
+            currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+            database.ref('/maintenance/logs').once('value')
+                .then(snapshot => {
+                    const logs = snapshot.val() || {};
+                    updateCalendar(logs);
+                });
         }
         
         // Tab switching functionality
@@ -1872,10 +2171,8 @@ Description: ${log.description}`);
                 if (data) {
                     indoorDevicesData[tagId] = {
                         id: data.deviceID || tagId,
-                        anchorId: data.anchor || "ANCHOR_01",
-                        x: data.x, 
-                        y: data.y,
                         distance: data.distance || 0,
+                        angle: data.angle || (Math.random() * 2 * Math.PI), // Random angle if not provided
                         status: data.status || "normal",
                         timestamp: data.timestamp !== undefined ? data.timestamp : Date.now()
                     };
@@ -1896,6 +2193,23 @@ Description: ${log.description}`);
             e.preventDefault();
             addMaintenanceLog();
         });
+        
+        // Cancel edit button
+        document.getElementById('cancel-edit').addEventListener('click', function(e) {
+            e.preventDefault();
+            resetForm();
+        });
+        
+        // Calendar navigation
+        document.getElementById('prev-month').addEventListener('click', prevMonth);
+        document.getElementById('next-month').addEventListener('click', nextMonth);
+        
+        // Initialize calendar
+        database.ref('/maintenance/logs').once('value')
+            .then(snapshot => {
+                const logs = snapshot.val() || {};
+                updateCalendar(logs);
+            });
 
         // Mobile-friendly initialization
         $(document).ready(function () {
@@ -1903,6 +2217,9 @@ Description: ${log.description}`);
             if ('Notification' in window) {
                 Notification.requestPermission();
             }
+            
+            // Initialize calendar with current date
+            currentDate = new Date();
         });
     </script>
 </body>

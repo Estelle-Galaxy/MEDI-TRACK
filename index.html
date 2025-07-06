@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MEDI-TRACK - Advanced Geofencing</title>
+    <title>MEDI-TRACK - Enhanced Calendar</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -601,17 +601,17 @@
         }
         
         .status-complete {
-            background-color: rgba(76, 175, 80, 0.15);
+            background-color: rgba(173, 243, 175, 0.15);
             color: var(--success);
         }
         
         .status-ongoing {
-            background-color: rgba(23, 162, 184, 0.15);
+            background-color: rgba(155, 225, 235, 0.15);
             color: var(--info);
         }
         
         .status-upcoming {
-            background-color: rgba(111, 66, 193, 0.15);
+            background-color: rgba(187, 152, 253, 0.15);
             color: var(--purple);
         }
         
@@ -766,7 +766,7 @@
             transform: translate(-50%, -50%);
         }
         
-        /* Calendar styles */
+        /* Calendar styles - Updated */
         .calendar-container {
             background: white;
             border-radius: 12px;
@@ -816,9 +816,8 @@
             color: var(--dark);
         }
         
+        /* Color-coded calendar events */
         .calendar-event {
-            background-color: var(--primary);
-            color: white;
             padding: 4px 8px;
             border-radius: 4px;
             font-size: 0.8rem;
@@ -827,10 +826,25 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            color: white;
+            transition: all 0.2s;
         }
         
         .calendar-event:hover {
-            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .calendar-event-complete {
+            background-color: #4CAF50; /* Green */
+        }
+        
+        .calendar-event-ongoing {
+            background-color: #17a2b8; /* Blue */
+        }
+        
+        .calendar-event-upcoming {
+            background-color: #6f42c1; /* Purple */
         }
         
         .edit-buttons {
@@ -1914,7 +1928,7 @@
             });
         }
         
-        // Calendar functions
+        // Calendar functions - Updated for color-coded events
         let currentDate = new Date();
         
         function updateCalendar(logs) {
@@ -1963,7 +1977,7 @@
                 Object.entries(logs).forEach(([key, log]) => {
                     if (log.date === dateStr) {
                         const event = document.createElement('div');
-                        event.className = 'calendar-event';
+                        event.className = `calendar-event calendar-event-${log.type}`;
                         event.textContent = `${log.deviceId}: ${log.description.substring(0, 15)}${log.description.length > 15 ? '...' : ''}`;
                         event.title = `${log.deviceId} - ${log.description}`;
                         event.addEventListener('click', () => {
